@@ -1,7 +1,7 @@
 # Valheim Docker Server - Automated & Secure
 
 [![Made With Love](https://img.shields.io/badge/Made%20with%20%E2%9D%A4%EF%B8%8F-by%20Jonathan-red)](https://github.com/MrGuato)
-[![Deploy Valheim](https://github.com/MrGuato/<Valheim_Game_Server>/actions/workflows/deploy.yml/badge.svg)](https://github.com/MrGuato/<YOUR-REPO-NAME>/actions/workflows/deploy.yml)
+[![Deploy Valheim](https://github.com/MrGuato/<Valheim_Game_Server>/actions/workflows/deploy.yml/badge.svg)](https://github.com/MrGuato/<Valheim_Game_Server>/actions/workflows/deploy.yml)
 [![Uptime Status](https://img.shields.io/uptimerobot/status/m798619615-533a3f0c1a578cd8e72699f7)](https://stats.uptimerobot.com/tybY8h8NyK)
 [![Docker Compose](https://img.shields.io/badge/Docker-Compose-blue?logo=docker)](https://docs.docker.com/compose/)
 [![Security Engineer](https://img.shields.io/badge/Security-Engineer-black)](https://github.com/MrGuato)
