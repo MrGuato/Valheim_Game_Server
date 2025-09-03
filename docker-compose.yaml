@@ -16,4 +16,11 @@ services:
     env_file: .env
     cap_add:
       - SYS_NICE   # optional, lets the server bump its thread priority
-
+  watchtower:
+    image: containrrr/watchtower:latest
+    container_name: watchtower
+    restart: unless-stopped
+    # Runs at 05:00 every day; updates only labeled services; cleans old images
+    command: --label-enable --cleanup --schedule "0 5 * * *"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
