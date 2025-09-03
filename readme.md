@@ -28,4 +28,4 @@ flowchart TD
     C --> D[Docker Compose: Valheim]
     C --> E[Watchtower: Auto-Updates]
     D --> F[Friends' Clients]
-    F -->|restricted by firewall| G[UniFi Firewall]
+    F -->|restricted by firewall| G[Firewall]
