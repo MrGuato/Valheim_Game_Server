@@ -1,0 +1,19 @@
+services:
+  valheim:
+    image: ghcr.io/lloesche/valheim-server:latest
+    container_name: valheim
+    restart: unless-stopped
+    stop_grace_period: 2m
+    # Valheim uses UDP; crossplay adds 2458/udp
+    ports:
+      - "2456-2457:2456-2457/udp"
+      # uncomment next line if you enable crossplay in .env
+      # - "2458:2458/udp"
+    volumes:
+      - ./config:/config
+      - ./data:/opt/valheim
+      - ./backups:/config/backups
+    env_file: .env
+    cap_add:
+      - SYS_NICE   # optional, lets the server bump its thread priority
+
