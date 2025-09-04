@@ -8,7 +8,7 @@ on:
 jobs:
   deploy:
     name: Local deploy on Valheim host
-    runs-on: [ self-hosted, linux, x64, valheim ]
+    runs-on: self-hosted
     steps:
       - name: Checkout
         uses: actions/checkout@v4
