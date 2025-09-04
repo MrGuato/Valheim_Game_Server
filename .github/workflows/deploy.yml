@@ -7,39 +7,12 @@ on:
 
 jobs:
   deploy:
-    name: Deploy to Valheim host
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
-    concurrency:
-      group: deploy-valheim
-      cancel-in-progress: false
-    permissions:
-      contents: read
-
+    name: Local deploy on Valheim host
+    runs-on: [ self-hosted, linux, x64, valheim ]
     steps:
-      - name: Checkout (metadata only)
+      - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Prepare SSH key and known_hosts
-        env:
-          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-          SSH_HOST: ${{ secrets.SSH_HOST }}
-          SSH_PORT: ${{ secrets.SSH_PORT || '22' }}
+      - name: Run deploy script
         run: |
-          set -euo pipefail
-          mkdir -p ~/.ssh
-          echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_ed25519
-          chmod 600 ~/.ssh/id_ed25519
-          # Preload host key for strict checking
-          ssh-keyscan -p "$SSH_PORT" -H "$SSH_HOST" >> ~/.ssh/known_hosts
-
-      - name: Trigger server-side deploy (forced command)
-        env:
-          SSH_HOST: ${{ secrets.SSH_HOST }}
-          SSH_USER: ${{ secrets.SSH_USER }}          
-          SSH_PORT: ${{ secrets.SSH_PORT || '22' }}
-        run: |
-          set -euo pipefail
-          # Opening an SSH session is enough — the server runs the forced command:
-          # command="/home/game_server/bin/deploy_valheim.sh" in authorized_keys
-          ssh -p "$SSH_PORT" -i ~/.ssh/id_ed25519 "$SSH_USER@$SSH_HOST" true
+          bash -euxo pipefail /home/game_server/bin/deploy_valheim.sh
