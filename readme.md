@@ -8,6 +8,7 @@
 [![Docker Compose](https://img.shields.io/badge/Docker–Compose-blue?logo=docker)]()
 ![GitHub Repo stars](https://img.shields.io/github/stars/MrGuato/Valheim_Game_Server?style=social)
 [![Last Commit](https://img.shields.io/github/last-commit/MrGuato/Valheim_Game_Server)]()
+[![pages-build-deployment](https://github.com/MrGuato/Valheim_Game_Server/actions/workflows/pages/pages-build-deployment/badge.svg)](https://github.com/MrGuato/Valheim_Game_Server/actions/workflows/pages/pages-build-deployment)
 
 ---
 
