@@ -1,0 +1,906 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Valheim Game Server - Docker CI/CD</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --notion-bg: #ffffff;
+            --notion-bg-secondary: #f7f6f3;
+            --notion-text: #37352f;
+            --notion-text-secondary: #787774;
+            --notion-border: #e9e9e7;
+            --notion-accent: #2383e2;
+            --valheim-gold: #d4af37;
+            --valheim-blue: #4a90e2;
+            --success-green: #0f7b0f;
+            --warning-orange: #d9730d;
+            --notion-sidebar: #fbfbfa;
+            --hover-bg: #f1f1ef;
+        }
+
+        [data-theme="dark"] {
+            --notion-bg: #191919;
+            --notion-bg-secondary: #2f2f2f;
+            --notion-text: #ffffff;
+            --notion-text-secondary: #9b9a97;
+            --notion-border: #373737;
+            --notion-accent: #529cca;
+            --notion-sidebar: #252525;
+            --hover-bg: #2f2f2f;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--notion-bg);
+            color: var(--notion-text);
+            line-height: 1.6;
+            font-size: 16px;
+        }
+
+        .theme-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            background: var(--notion-bg-secondary);
+            border: 1px solid var(--notion-border);
+            border-radius: 8px;
+            padding: 8px 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 14px;
+            color: var(--notion-text-secondary);
+        }
+
+        .theme-toggle:hover {
+            background: var(--hover-bg);
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        .page-header {
+            padding: 60px 0 40px;
+            border-bottom: 1px solid var(--notion-border);
+            margin-bottom: 0;
+        }
+
+        .page-icon {
+            font-size: 78px;
+            margin-bottom: 16px;
+            display: block;
+        }
+
+        .page-title {
+            font-size: 40px;
+            font-weight: 700;
+            color: var(--notion-text);
+            margin-bottom: 8px;
+            line-height: 1.2;
+        }
+
+        .page-description {
+            font-size: 16px;
+            color: var(--notion-text-secondary);
+            margin-bottom: 24px;
+            line-height: 1.5;
+        }
+
+        .property-row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .property-name {
+            color: var(--notion-text-secondary);
+            min-width: 120px;
+            font-weight: 500;
+        }
+
+        .property-value {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .tag {
+            background: var(--notion-bg-secondary);
+            color: var(--notion-text);
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 500;
+            border: 1px solid var(--notion-border);
+        }
+
+        .tag.docker { background: #e8f4fd; color: #1e3a8a; }
+        .tag.cicd { background: #f0fdf4; color: #166534; }
+        .tag.github { background: #f3f4f6; color: #374151; }
+        .tag.gaming { background: #fef3c7; color: #92400e; }
+
+        [data-theme="dark"] .tag.docker { background: #1e3a8a; color: #bfdbfe; }
+        [data-theme="dark"] .tag.cicd { background: #166534; color: #bbf7d0; }
+        [data-theme="dark"] .tag.github { background: #374151; color: #d1d5db; }
+        [data-theme="dark"] .tag.gaming { background: #92400e; color: #fcd34d; }
+
+        .action-buttons {
+            display: flex;
+            gap: 12px;
+            margin-top: 24px;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            border: 1px solid var(--notion-border);
+            border-radius: 6px;
+            background: var(--notion-bg);
+            color: var(--notion-text);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+
+        .btn:hover {
+            background: var(--hover-bg);
+        }
+
+        .btn-primary {
+            background: var(--notion-accent);
+            color: white;
+            border-color: var(--notion-accent);
+        }
+
+        .btn-primary:hover {
+            background: #1a73c2;
+            border-color: #1a73c2;
+        }
+
+        .content-section {
+            padding: 32px 0;
+            border-bottom: 1px solid var(--notion-border);
+        }
+
+        .content-section:last-child {
+            border-bottom: none;
+        }
+
+        .section-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: var(--notion-text);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .section-content {
+            color: var(--notion-text-secondary);
+            line-height: 1.6;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 16px;
+            margin: 24px 0;
+        }
+
+        .feature-card {
+            background: var(--notion-bg);
+            border: 1px solid var(--notion-border);
+            border-radius: 8px;
+            padding: 20px;
+            transition: all 0.2s ease;
+        }
+
+        .feature-card:hover {
+            background: var(--hover-bg);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        [data-theme="dark"] .feature-card:hover {
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .feature-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .feature-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+
+        .feature-icon.docker { background: #e8f4fd; color: #1e3a8a; }
+        .feature-icon.cicd { background: #f0fdf4; color: #166534; }
+        .feature-icon.hosting { background: #fef3c7; color: #92400e; }
+        .feature-icon.code { background: #f3e8ff; color: #7c3aed; }
+        .feature-icon.monitoring { background: #ecfdf5; color: #059669; }
+        .feature-icon.security { background: #fef2f2; color: #dc2626; }
+
+        [data-theme="dark"] .feature-icon.docker { background: #1e3a8a; color: #bfdbfe; }
+        [data-theme="dark"] .feature-icon.cicd { background: #166534; color: #bbf7d0; }
+        [data-theme="dark"] .feature-icon.hosting { background: #92400e; color: #fcd34d; }
+        [data-theme="dark"] .feature-icon.code { background: #7c3aed; color: #ddd6fe; }
+        [data-theme="dark"] .feature-icon.monitoring { background: #059669; color: #a7f3d0; }
+        [data-theme="dark"] .feature-icon.security { background: #dc2626; color: #fecaca; }
+
+        .feature-title {
+            font-weight: 600;
+            color: var(--notion-text);
+            font-size: 16px;
+        }
+
+        .feature-description {
+            color: var(--notion-text-secondary);
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .code-block {
+            background: var(--notion-bg-secondary);
+            border: 1px solid var(--notion-border);
+            border-radius: 6px;
+            padding: 16px;
+            font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', monospace;
+            font-size: 14px;
+            margin: 16px 0;
+            overflow-x: auto;
+            color: var(--notion-text);
+        }
+
+        .code-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 12px;
+            font-size: 13px;
+            color: var(--notion-text-secondary);
+        }
+
+        .step-list {
+            counter-reset: step;
+        }
+
+        .step-item {
+            counter-increment: step;
+            display: flex;
+            gap: 16px;
+            margin-bottom: 24px;
+            padding: 16px 0;
+        }
+
+        .step-number {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 28px;
+            height: 28px;
+            border-radius: 14px;
+            background: var(--notion-accent);
+            color: white;
+            font-weight: 600;
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+
+        .step-content {
+            flex: 1;
+        }
+
+        .step-title {
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--notion-text);
+        }
+
+        .step-description {
+            color: var(--notion-text-secondary);
+            font-size: 14px;
+            margin-bottom: 12px;
+        }
+
+        .tech-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 12px;
+            margin: 24px 0;
+        }
+
+        .tech-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px;
+            background: var(--notion-bg-secondary);
+            border: 1px solid var(--notion-border);
+            border-radius: 6px;
+            transition: all 0.2s ease;
+            font-size: 14px;
+        }
+
+        .tech-item:hover {
+            background: var(--hover-bg);
+        }
+
+        .tech-item i {
+            color: var(--notion-accent);
+            font-size: 18px;
+        }
+
+        .callout {
+            display: flex;
+            gap: 12px;
+            padding: 16px;
+            margin: 20px 0;
+            background: var(--notion-bg-secondary);
+            border: 1px solid var(--notion-border);
+            border-radius: 6px;
+            border-left: 4px solid var(--valheim-gold);
+        }
+
+        .callout-icon {
+            font-size: 18px;
+            color: var(--valheim-gold);
+            margin-top: 2px;
+        }
+
+        .callout-content {
+            flex: 1;
+            font-size: 14px;
+            color: var(--notion-text-secondary);
+        }
+
+        .toc {
+            background: var(--notion-bg-secondary);
+            border: 1px solid var(--notion-border);
+            border-radius: 8px;
+            padding: 20px;
+            margin: 24px 0;
+        }
+
+        .toc-title {
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: var(--notion-text);
+            font-size: 14px;
+        }
+
+        .toc-list {
+            list-style: none;
+        }
+
+        .toc-list li {
+            margin: 6px 0;
+        }
+
+        .toc-list a {
+            color: var(--notion-text-secondary);
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.2s ease;
+        }
+
+        .toc-list a:hover {
+            color: var(--notion-accent);
+        }
+
+        .footer {
+            margin-top: 64px;
+            padding: 32px 0;
+            border-top: 1px solid var(--notion-border);
+            text-align: center;
+            color: var(--notion-text-secondary);
+            font-size: 14px;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 24px;
+            margin-bottom: 16px;
+        }
+
+        .footer-links a {
+            color: var(--notion-text-secondary);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: color 0.2s ease;
+        }
+
+        .footer-links a:hover {
+            color: var(--notion-accent);
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 0 16px;
+            }
+            
+            .page-title {
+                font-size: 32px;
+            }
+            
+            .feature-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+            }
+            
+            .tech-grid {
+                grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            }
+        }
+
+        /* Smooth transitions for theme switching */
+        * {
+            transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--notion-bg-secondary);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--notion-border);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--notion-text-secondary);
+        }
+    </style>
+</head>
+<body>
+    <button class="theme-toggle" onclick="toggleTheme()">
+        <i class="fas fa-moon"></i> Toggle Dark Mode
+    </button>
+
+    <div class="container">
+        <header class="page-header">
+            <div class="page-icon">⚔️</div>
+            <h1 class="page-title">Valheim Game Server</h1>
+            <p class="page-description">Docker CI/CD DevOps Project - Self-Hosted Gaming Infrastructure</p>
+            
+            <div class="property-row">
+                <span class="property-name">Type</span>
+                <div class="property-value">
+                    <span class="tag docker">Docker</span>
+                    <span class="tag cicd">CI/CD</span>
+                    <span class="tag github">GitHub Actions</span>
+                    <span class="tag gaming">Gaming Server</span>
+                </div>
+            </div>
+            
+            <div class="property-row">
+                <span class="property-name">Status</span>
+                <div class="property-value">
+                    <span class="tag cicd">✅ Active Development</span>
+                </div>
+            </div>
+            
+            <div class="property-row">
+                <span class="property-name">Repository</span>
+                <div class="property-value">
+                    <span class="tag github">MrGuato/Valheim_Game_Server</span>
+                </div>
+            </div>
+
+            <div class="action-buttons">
+                <a href="https://github.com/MrGuato/Valheim_Game_Server" class="btn btn-primary" target="_blank">
+                    <i class="fab fa-github"></i> View on GitHub
+                </a>
+                <a href="#quick-start" class="btn">
+                    <i class="fas fa-rocket"></i> Quick Start
+                </a>
+                <a href="#documentation" class="btn">
+                    <i class="fas fa-book"></i> Documentation
+                </a>
+            </div>
+        </header>
+
+        <nav class="toc">
+            <div class="toc-title">📖 Table of Contents</div>
+            <ul class="toc-list">
+                <li><a href="#overview">Project Overview</a></li>
+                <li><a href="#features">Key Features</a></li>
+                <li><a href="#quick-start">Quick Start Guide</a></li>
+                <li><a href="#tech-stack">Technology Stack</a></li>
+                <li><a href="#documentation">Documentation</a></li>
+            </ul>
+        </nav>
+
+        <section class="content-section" id="overview">
+            <h2 class="section-title">
+                <i class="fas fa-info-circle"></i> Project Overview
+            </h2>
+            <div class="section-content">
+                <p>A robust, containerized Valheim gaming server deployment using modern DevOps practices. This project demonstrates infrastructure as code, automated CI/CD pipelines, and self-hosted GitHub runners for seamless game server management.</p>
+                
+                <div class="callout">
+                    <div class="callout-icon">⚡</div>
+                    <div class="callout-content">
+                        <strong>Key Achievement:</strong> Fully automated deployment pipeline that can provision, configure, and deploy a Valheim game server with zero manual intervention.
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="content-section" id="features">
+            <h2 class="section-title">
+                <i class="fas fa-star"></i> Key Features
+            </h2>
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <div class="feature-header">
+                        <div class="feature-icon docker">
+                            <i class="fab fa-docker"></i>
+                        </div>
+                        <div class="feature-title">Docker Containerization</div>
+                    </div>
+                    <div class="feature-description">
+                        Fully containerized Valheim server using Docker Compose for consistent deployment across any environment.
+                    </div>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-header">
+                        <div class="feature-icon cicd">
+                            <i class="fas fa-sync-alt"></i>
+                        </div>
+                        <div class="feature-title">Automated CI/CD</div>
+                    </div>
+                    <div class="feature-description">
+                        GitHub Actions pipeline with automated testing, building, and deployment for seamless updates.
+                    </div>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-header">
+                        <div class="feature-icon hosting">
+                            <i class="fas fa-home"></i>
+                        </div>
+                        <div class="feature-title">Self-Hosted Runner</div>
+                    </div>
+                    <div class="feature-description">
+                        Custom GitHub runner setup for direct deployment to your own infrastructure without external dependencies.
+                    </div>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-header">
+                        <div class="feature-icon code">
+                            <i class="fas fa-code"></i>
+                        </div>
+                        <div class="feature-title">Infrastructure as Code</div>
+                    </div>
+                    <div class="feature-description">
+                        All server configuration managed through code with version control and rollback capabilities.
+                    </div>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-header">
+                        <div class="feature-icon monitoring">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <div class="feature-title">Monitoring & Logging</div>
+                    </div>
+                    <div class="feature-description">
+                        Built-in logging and monitoring solutions to track server performance and player activity.
+                    </div>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-header">
+                        <div class="feature-icon security">
+                            <i class="fas fa-shield-alt"></i>
+                        </div>
+                        <div class="feature-title">Security First</div>
+                    </div>
+                    <div class="feature-description">
+                        Secure deployment with proper networking, secrets management, and access controls.
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="content-section" id="quick-start">
+            <h2 class="section-title">
+                <i class="fas fa-rocket"></i> Quick Start Guide
+            </h2>
+            <div class="step-list">
+                <div class="step-item">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <div class="step-title">Clone the Repository</div>
+                        <div class="step-description">Get the project files on your local machine</div>
+                        <div class="code-block">
+                            <div class="code-header">
+                                <i class="fas fa-terminal"></i> Terminal
+                            </div>
+                            git clone https://github.com/MrGuato/Valheim_Game_Server.git<br>
+                            cd Valheim_Game_Server
+                        </div>
+                    </div>
+                </div>
+
+                <div class="step-item">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <div class="step-title">Configure Environment</div>
+                        <div class="step-description">Set up your server configuration and credentials</div>
+                        <div class="code-block">
+                            <div class="code-header">
+                                <i class="fas fa-cog"></i> Configuration
+                            </div>
+                            cp .env.example .env<br>
+                            # Edit .env with your server name, password, and world settings
+                        </div>
+                    </div>
+                </div>
+
+                <div class="step-item">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <div class="step-title">Deploy with Docker Compose</div>
+                        <div class="step-description">Launch your Valheim server container</div>
+                        <div class="code-block">
+                            <div class="code-header">
+                                <i class="fab fa-docker"></i> Docker
+                            </div>
+                            docker-compose up -d
+                        </div>
+                        <div class="callout">
+                            <div class="callout-icon">ℹ️</div>
+                            <div class="callout-content">
+                                Your Valheim server will be running on ports 2456-2458. Make sure these ports are open in your firewall.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="step-item">
+                    <div class="step-number">4</div>
+                    <div class="step-content">
+                        <div class="step-title">Setup GitHub Runner (Optional)</div>
+                        <div class="step-description">Enable automated deployments with a self-hosted runner</div>
+                        <div class="code-block">
+                            <div class="code-header">
+                                <i class="fab fa-github"></i> GitHub Actions
+                            </div>
+                            # Follow the GitHub runner setup guide in the repository<br>
+                            ./setup-runner.sh
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="content-section" id="tech-stack">
+            <h2 class="section-title">
+                <i class="fas fa-layer-group"></i> Technology Stack
+            </h2>
+            <div class="section-content">
+                <p>This project leverages modern DevOps tools and practices:</p>
+                <div class="tech-grid">
+                    <div class="tech-item">
+                        <i class="fab fa-docker"></i>
+                        <span>Docker</span>
+                    </div>
+                    <div class="tech-item">
+                        <i class="fab fa-github"></i>
+                        <span>GitHub Actions</span>
+                    </div>
+                    <div class="tech-item">
+                        <i class="fas fa-server"></i>
+                        <span>Valheim Server</span>
+                    </div>
+                    <div class="tech-item">
+                        <i class="fab fa-linux"></i>
+                        <span>Linux</span>
+                    </div>
+                    <div class="tech-item">
+                        <i class="fas fa-code-branch"></i>
+                        <span>Git</span>
+                    </div>
+                    <div class="tech-item">
+                        <i class="fas fa-cloud"></i>
+                        <span>Self-Hosted</span>
+                    </div>
+                    <div class="tech-item">
+                        <i class="fas fa-file-code"></i>
+                        <span>YAML</span>
+                    </div>
+                    <div class="tech-item">
+                        <i class="fas fa-terminal"></i>
+                        <span>Bash Scripts</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="content-section" id="documentation">
+            <h2 class="section-title">
+                <i class="fas fa-book"></i> Documentation & Resources
+            </h2>
+            <div class="section-content">
+                <p>Comprehensive documentation and resources are available to help you get started and troubleshoot any issues:</p>
+                
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <div class="feature-header">
+                            <div class="feature-icon code">
+                                <i class="fas fa-book-open"></i>
+                            </div>
+                            <div class="feature-title">Wiki & Documentation</div>
+                        </div>
+                        <div class="feature-description">
+                            Complete setup guides, architecture diagrams, and best practices.
+                        </div>
+                    </div>
+
+                    <div class="feature-card">
+                        <div class="feature-header">
+                            <div class="feature-icon monitoring">
+                                <i class="fas fa-bug"></i>
+                            </div>
+                            <div class="feature-title">Issues & Support</div>
+                        </div>
+                        <div class="feature-description">
+                            Report bugs, request features, and get community support.
+                        </div>
+                    </div>
+
+                    <div class="feature-card">
+                        <div class="feature-header">
+                            <div class="feature-icon cicd">
+                                <i class="fas fa-download"></i>
+                            </div>
+                            <div class="feature-title">Latest Releases</div>
+                        </div>
+                        <div class="feature-description">
+                            Download stable releases and view changelog information.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="action-buttons" style="margin-top: 24px;">
+                    <a href="https://github.com/MrGuato/Valheim_Game_Server/wiki" class="btn" target="_blank">
+                        <i class="fas fa-external-link-alt"></i> View Wiki
+                    </a>
+                    <a href="https://github.com/MrGuato/Valheim_Game_Server/issues" class="btn" target="_blank">
+                        <i class="fas fa-external-link-alt"></i> Issues
+                    </a>
+                    <a href="https://github.com/MrGuato/Valheim_Game_Server/releases" class="btn" target="_blank">
+                        <i class="fas fa-external-link-alt"></i> Releases
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <footer class="footer">
+            <div class="footer-links">
+                <a href="https://github.com/MrGuato" target="_blank">
+                    <i class="fab fa-github"></i> GitHub Profile
+                </a>
+                <a href="https://github.com/MrGuato/Valheim_Game_Server" target="_blank">
+                    <i class="fas fa-code"></i> Source Code
+                </a>
+                <a href="mailto:contact@example.com">
+                    <i class="fas fa-envelope"></i> Contact
+                </a>
+            </div>
+            <p>&copy; 2025 MrGuato | Valheim Game Server DevOps Project</p>
+            <p style="margin-top: 8px; font-size: 13px; opacity: 0.7;">
+                "Deploying adventures, one container at a time" ⚔️
+            </p>
+        </footer>
+    </div>
+
+    <script>
+        // Theme toggle functionality
+        function toggleTheme() {
+            const body = document.body;
+            const themeToggle = document.querySelector('.theme-toggle');
+            
+            if (body.getAttribute('data-theme') === 'dark') {
+                body.removeAttribute('data-theme');
+                localStorage.setItem('theme', 'light');
+                themeToggle.innerHTML = '<i class="fas fa-moon"></i> Toggle Dark Mode';
+            } else {
+                body.setAttribute('data-theme', 'dark');
+                localStorage.setItem('theme', 'dark');
+                themeToggle.innerHTML = '<i class="fas fa-sun"></i> Toggle Light Mode';
+            }
+        }
+
+        // Load saved theme on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            const savedTheme = localStorage.getItem('theme');
+            const themeToggle = document.querySelector('.theme-toggle');
+            
+            if (savedTheme === 'dark') {
+                document.body.setAttribute('data-theme', 'dark');
+                themeToggle.innerHTML = '<i class="fas fa-sun"></i> Toggle Light Mode';
+            }
+        });
+
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Add subtle animation on scroll
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+
+        // Observe all content sections for scroll animations
+        document.addEventListener('DOMContentLoaded', function() {
+            const sections = document.querySelectorAll('.content-section');
+            sections.forEach(section => {
+                section.style.opacity = '0';
+                section.style.transform = 'translateY(20px)';
+                section.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+                observer.observe(section);
+            });
+        });
