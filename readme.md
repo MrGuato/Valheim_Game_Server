@@ -5,13 +5,11 @@
 [![Deploy via Runnner](https://github.com/MrGuato/Valheim_Game_Server/actions/workflows/deploy.yml/badge.svg)](https://github.com/MrGuato/Valheim_Game_Server/actions/workflows/deploy.yml)
 [![Known Vulnerabilities](https://snyk.io/test/github/MrGuato/Valheim_Game_Server/badge.svg)](https://snyk.io/test/github/MrGuato/Valheim_Game_Server)
 [![Dependabot](https://img.shields.io/badge/Dependabot-enabled-brightgreen?logo=dependabot)]()
-[![Docker Compose](https://img.shields.io/badge/Docker–Compose-blue?logo=docker)]()
 ![GitHub Repo stars](https://img.shields.io/github/stars/MrGuato/Valheim_Game_Server?style=social)
 [![pages-build-deployment](https://github.com/MrGuato/Valheim_Game_Server/actions/workflows/pages/pages-build-deployment/badge.svg)](https://github.com/MrGuato/Valheim_Game_Server/actions/workflows/pages/pages-build-deployment)
 [![Last Commit](https://img.shields.io/github/last-commit/MrGuato/Valheim_Game_Server)]()
 
 ---
-
 ## Project Overview
 This repository provides the **infrastructure** needed to run a secure, automated Valheim dedicated server.  
 
@@ -228,3 +226,6 @@ This repository holds infra-as-code only.
 - No secrets, world files, or backups are committed.
 - .env is local-only, with an .env.example provided.
 - GitHub Actions uses Secrets for all credentials.
+
+See you in the Viking Lands! Cheers! 
+<img width="1706" height="707" alt="image" src="https://github.com/user-attachments/assets/f05c228a-8905-4690-aa1c-33e72bb32208" />
