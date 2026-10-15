@@ -1,26 +1,50 @@
 services:
   valheim:
-    image: ghcr.io/lloesche/valheim-server:latest
-    container_name: valheim
+    image: ${IMAGE_REPOSITORY:-ghcr.io/mrguato/valheim_game_server}:${IMAGE_TAG:-latest}
+    pull_policy: always
+    container_name: ${CONTAINER_NAME:-valheim}
     restart: unless-stopped
+    # Valheim saves the world when it receives SIGINT; give it time before Docker kills it.
     stop_grace_period: 2m
-    # Valheim uses UDP; crossplay adds 2458/udp
     ports:
-      - "2456-2457:2456-2457/udp"
-      # uncomment next line if you enable crossplay in .env
+      - "${SERVER_PORT:-2456}:${SERVER_PORT:-2456}/udp"   # game
+      - "${QUERY_PORT:-2457}:${QUERY_PORT:-2457}/udp"     # Steam query (always game port + 1)
+      # uncomment when CROSSPLAY=true in .env
       # - "2458:2458/udp"
-    volumes:
-      - ./config:/config
-      - ./data:/opt/valheim
-      - ./backups:/config/backups
     env_file: .env
+    environment:
+      PUID: ${PUID:-1000}
+      PGID: ${PGID:-1000}
+      UPDATE_ON_START: ${UPDATE_ON_START:-true}
+    volumes:
+      - ./config:/config                 # worlds_local/, adminlist.txt, bannedlist.txt, permittedlist.txt
+      - ./data:/opt/valheim              # game files from SteamCMD (~2.2 GB, reproducible)
+      - ./backups:/config/backups        # backup folder (used by scripts/backup.sh and by lloesche/valheim-server)
     cap_add:
-      - SYS_NICE   # optional, lets the server bump its thread priority
+      - SYS_NICE                         # lets the server raise its thread priority (optional)
+    healthcheck:
+      test: ["CMD", "/usr/local/bin/healthcheck.sh"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 10m
+    logging:
+      driver: json-file
+      options:
+        max-size: "20m"
+        max-file: "5"
+    labels:
+      - com.centurylinklabs.watchtower.enable=true
+
   watchtower:
     image: containrrr/watchtower:latest
     container_name: watchtower
     restart: unless-stopped
     # Runs at 05:00 every day; updates only labeled services; cleans old images
     command: --label-enable --cleanup --schedule "0 5 * * *"
+    environment:
+      # Docker Engine 29+ rejects the old API version watchtower's client negotiates
+      # ("client version 1.25 is too old"); pinning the API version fixes the crash loop.
+      DOCKER_API_VERSION: "1.44"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
