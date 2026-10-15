@@ -1,0 +1,248 @@
+#!/usr/bin/env bash
+# Single CLI for the Valheim dedicated server stack. Run ./valheim help.
+set -euo pipefail
+
+REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+cd "$REPO_DIR"
+
+COMPOSE_BIN="docker compose"
+COMPOSE_FILES="-f docker-compose.yaml"
+SERVICE="valheim"
+
+C_RESET='\033[0m'
+C_BOLD='\033[1m'
+C_RED='\033[31m'
+C_GREEN='\033[32m'
+C_YELLOW='\033[33m'
+C_BLUE='\033[34m'
+C_CYAN='\033[36m'
+
+if [ ! -t 1 ] || [ "${NO_COLOR:-0}" = "1" ]; then
+    C_RESET=''; C_BOLD=''; C_RED=''; C_GREEN=''; C_YELLOW=''; C_BLUE=''; C_CYAN=''
+fi
+
+log()  { printf '%b[valheim]%b %s\n' "$C_CYAN" "$C_RESET" "$*"; }
+ok()   { printf '%b[valheim]%b %s\n' "$C_GREEN" "$C_RESET" "$*"; }
+warn() { printf '%b[valheim]%b %s\n' "$C_YELLOW" "$C_RESET" "$*"; }
+err()  { printf '%b[valheim]%b %s\n' "$C_RED" "$C_RESET" "$*" >&2; }
+
+banner() {
+    printf '%b' "$C_BOLD$C_BLUE"
+    cat <<'BANNER'
++----------------------------------------------+
+|  Valheim Dedicated Server   -   by MrGuato   |
++----------------------------------------------+
+BANNER
+    printf '%b\n' "$C_RESET"
+}
+
+require_env() {
+    if [ ! -f .env ]; then
+        err "Missing .env file. Run: ./valheim setup"
+        exit 1
+    fi
+}
+
+require_docker() {
+    if ! command -v docker >/dev/null 2>&1; then
+        err "Docker is not installed. See docs/installation.md"
+        exit 1
+    fi
+    if ! docker compose version >/dev/null 2>&1; then
+        err "Docker Compose v2 plugin is not installed."
+        exit 1
+    fi
+}
+
+dc() {
+    # shellcheck disable=SC2086
+    $COMPOSE_BIN $COMPOSE_FILES "$@"
+}
+
+env_value() {   # env_value KEY -> value from .env (without quotes), empty if unset
+    sed -n "s/^$1=//p" .env 2>/dev/null | head -n 1 | sed -e 's/[[:space:]]*#.*$//' -e 's/^"\(.*\)"$/\1/'
+}
+
+cmd_setup() {
+    banner
+    log "First-time setup"
+
+    if [ -f .env ]; then
+        warn ".env already exists. Edit it manually or remove it to re-run setup."
+        exit 0
+    fi
+
+    cp .env.example .env
+
+    local name world password public crossplay tz
+    read -r -p "Server name [Saberguard Valheim]: " name
+    name=${name:-Saberguard Valheim}
+    read -r -p "World name (letters, digits, - and _ only) [Midgard]: " world
+    world=${world:-Midgard}
+    while :; do
+        read -r -p "Server password (5+ characters, not part of the server name): " password
+        if [ "${#password}" -lt 5 ]; then warn "Too short."; continue; fi
+        case "${name,,}" in *"${password,,}"*) warn "The password must not appear in the server name."; continue ;; esac
+        break
+    done
+    read -r -p "List the server in the public browser? [Y/n]: " public
+    case "${public,,}" in n|no) public=false ;; *) public=true ;; esac
+    read -r -p "Enable crossplay (Xbox / Microsoft Store)? [y/N]: " crossplay
+    case "${crossplay,,}" in y|yes) crossplay=true ;; *) crossplay=false ;; esac
+    read -r -p "Time zone [America/New_York]: " tz
+    tz=${tz:-America/New_York}
+
+    sed -i "s|^SERVER_NAME=.*|SERVER_NAME=$name|"         .env
+    sed -i "s|^WORLD_NAME=.*|WORLD_NAME=$world|"          .env
+    sed -i "s|^SERVER_PASS=.*|SERVER_PASS=$password|"     .env
+    sed -i "s|^SERVER_PUBLIC=.*|SERVER_PUBLIC=$public|"   .env
+    sed -i "s|^CROSSPLAY=.*|CROSSPLAY=$crossplay|"        .env
+    sed -i "s|^TZ=.*|TZ=$tz|"                             .env
+    chmod 600 .env
+
+    mkdir -p config data backups logs
+    chown -R 1000:1000 config data 2>/dev/null || sudo chown -R 1000:1000 config data
+
+    ok "Setup complete. Wrote ./.env (mode 600)"
+    if [ "$crossplay" = "true" ]; then
+        warn "Crossplay: uncomment the 2458/udp port line in docker-compose.yaml and forward it on your router."
+    fi
+    log "Next: ./valheim start"
+}
+
+cmd_start() {
+    require_docker
+    require_env
+    log "Starting server"
+    dc up -d
+    ok "Started. Tailing logs (Ctrl+C to detach, the server keeps running):"
+    dc logs -f --tail 50 "$SERVICE"
+}
+
+cmd_stop() {
+    require_docker
+    log "Stopping server (the world is saved first, this can take up to 2 minutes)"
+    dc stop "$SERVICE"
+    ok "Stopped"
+}
+
+cmd_restart() {
+    require_docker
+    log "Restarting server (world is saved first)"
+    dc restart "$SERVICE"
+    ok "Restarted"
+}
+
+cmd_down() {
+    require_docker
+    log "Removing containers (worlds, config and game files persist in ./config and ./data)"
+    dc down
+    ok "Down"
+}
+
+cmd_logs() {
+    require_docker
+    dc logs -f --tail "${1:-100}" "$SERVICE"
+}
+
+cmd_status() {
+    require_docker
+    banner
+    dc ps
+    echo
+    local cname
+    cname="$(env_value CONTAINER_NAME)"; cname="${cname:-valheim}"
+    log "Health:   $(docker inspect --format='{{.State.Health.Status}}' "$cname" 2>/dev/null || echo 'n/a')"
+    log "Started:  $(docker inspect --format='{{.State.StartedAt}}' "$cname" 2>/dev/null || echo 'n/a')"
+    log "Image:    $(docker inspect --format='{{.Config.Image}}' "$cname" 2>/dev/null || echo 'n/a')"
+    if [ -f .env ]; then
+        echo
+        log "Server:   $(env_value SERVER_NAME)"
+        log "World:    $(env_value WORLD_NAME)"
+        log "Public:   $(env_value SERVER_PUBLIC)   Crossplay: $(env_value CROSSPLAY)   Port: $(env_value SERVER_PORT)/udp"
+    fi
+    local players
+    players="$(docker logs --tail 2000 "$cname" 2>&1 | grep -oE 'Connections [0-9]+' | tail -n 1 | awk '{print $2}')"
+    if [ -n "$players" ]; then log "Players:  $players connected (last log sample)"; fi
+}
+
+cmd_update() {
+    require_docker
+    require_env
+    log "Pulling latest image"
+    dc pull "$SERVICE"
+    log "Recreating container (SteamCMD validates the game files on start)"
+    dc up -d "$SERVICE"
+    ok "Update started. Watch it with: ./valheim logs"
+}
+
+cmd_shell() {
+    require_docker
+    dc exec "$SERVICE" bash
+}
+
+cmd_backup() {
+    "$REPO_DIR/scripts/backup.sh" "$@"
+}
+
+cmd_restore() {
+    "$REPO_DIR/scripts/restore.sh" "$@"
+}
+
+cmd_build() {
+    require_docker
+    log "Building the image locally (docker-compose.dev.yml override)"
+    docker compose -f docker-compose.yaml -f docker-compose.dev.yml build "$@"
+    ok "Built. To run the local image:"
+    echo "  IMAGE_REPOSITORY=valheim_game_server IMAGE_TAG=dev ./valheim start"
+}
+
+cmd_help() {
+    banner
+    cat <<HELP
+Usage: ./valheim <command> [args]
+
+Setup
+  setup         First-time interactive setup; writes .env and creates the data folders
+
+Lifecycle
+  start         Start the server in the background and tail logs
+  stop          Stop the server (saves the world first; container retained)
+  restart       Restart the container
+  down          Remove the containers (worlds and game files persist)
+
+Visibility
+  status        Show container, health, server info and last known player count
+  logs [N]      Tail the last N log lines (default 100)
+  shell         Open a bash shell inside the container
+
+Maintenance
+  update        Pull the latest image and recreate (SteamCMD validates game files on start)
+  build         Build the image locally from the Dockerfile
+  backup        Snapshot worlds and player lists to ./backups (RETENTION_DAYS, BACKUP_DIR)
+  restore FILE  Restore from a backup tarball (stops and restarts the server)
+
+  help          Show this help
+HELP
+}
+
+case "${1:-help}" in
+    setup)   shift; cmd_setup   "$@" ;;
+    start)   shift; cmd_start   "$@" ;;
+    stop)    shift; cmd_stop    "$@" ;;
+    restart) shift; cmd_restart "$@" ;;
+    down)    shift; cmd_down    "$@" ;;
+    logs)    shift; cmd_logs    "$@" ;;
+    status)  shift; cmd_status  "$@" ;;
+    update)  shift; cmd_update  "$@" ;;
+    shell)   shift; cmd_shell   "$@" ;;
+    backup)  shift; cmd_backup  "$@" ;;
+    restore) shift; cmd_restore "$@" ;;
+    build)   shift; cmd_build   "$@" ;;
+    help|-h|--help) cmd_help ;;
+    *)
+        err "Unknown command: $1"
+        cmd_help
+        exit 1
+        ;;
+esac

@@ -1,0 +1,10 @@
+# Override for building the image locally instead of pulling from GHCR:
+#   ./valheim build
+#   IMAGE_REPOSITORY=valheim_game_server IMAGE_TAG=dev ./valheim start
+services:
+  valheim:
+    image: valheim_game_server:dev
+    build:
+      context: .
+      dockerfile: Dockerfile
+    pull_policy: never

@@ -5,6 +5,11 @@ permissions:
 on:
   push:
     branches: [ "main" ]
+    # documentation-only changes do not need a redeploy of the live server
+    paths-ignore:
+      - 'docs/**'
+      - '*.md'
+      - 'index.html'
   workflow_dispatch:
 
 jobs:

@@ -2,3 +2,9 @@
 config/
 data/
 backups/
+logs/
+*.log
+*.tar.gz
+.idea/
+.vscode/
+.DS_Store
