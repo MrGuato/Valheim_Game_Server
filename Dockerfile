@@ -2,7 +2,7 @@
 # The image is immutable: it ships SteamCMD only. The game files are downloaded and
 # validated on every container start (UPDATE_ON_START=true), so the image never goes
 # stale between Valheim patches. Saves live in /config, game files in /opt/valheim.
-FROM ubuntu:22.04
+FROM ubuntu:26.04
 
 LABEL org.opencontainers.image.source="https://github.com/MrGuato/Valheim_Game_Server" \
       org.opencontainers.image.description="Valheim Dedicated Server (SteamCMD, native Linux build) by MrGuato" \
