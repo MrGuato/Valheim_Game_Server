@@ -28,7 +28,9 @@ That pulls the latest image from GHCR, recreates the container and lets SteamCMD
 
 ## Automatic image updates
 
-`docker-compose.yaml` includes Watchtower, which checks GHCR every day at 05:00 and recreates the Valheim container when a new image for your tag exists. It only touches containers with the `com.centurylinklabs.watchtower.enable=true` label, which the Valheim service carries.
+`docker-compose.yaml` includes Watchtower, which checks GHCR every day at 05:00 (in the `TZ` from `.env`, UTC if unset) and recreates the Valheim container when a new image for your tag exists. It only touches containers with the `com.centurylinklabs.watchtower.enable=true` label, which the Valheim service carries.
+
+Watchtower's `--schedule` takes six cron fields with seconds first, so the compose file uses `0 0 5 * * *`. The usual five-field `0 5 * * *` would run every hour at minute 5.
 
 Remove the `watchtower` service from the compose file if you prefer manual updates.
 

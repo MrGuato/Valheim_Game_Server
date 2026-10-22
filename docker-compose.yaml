@@ -40,9 +40,11 @@ services:
     image: containrrr/watchtower:latest
     container_name: watchtower
     restart: unless-stopped
-    # Runs at 05:00 every day; updates only labeled services; cleans old images
-    command: --label-enable --cleanup --schedule "0 5 * * *"
+    # Runs at 05:00 every day (in TZ from .env); updates only labeled services; cleans old images.
+    # Watchtower cron has a seconds field first: "0 5 * * *" would mean every hour at minute 5.
+    command: --label-enable --cleanup --schedule "0 0 5 * * *"
     environment:
+      TZ: ${TZ:-UTC}
       # Docker Engine 29+ rejects the old API version watchtower's client negotiates
       # ("client version 1.25 is too old"); pinning the API version fixes the crash loop.
       DOCKER_API_VERSION: "1.44"
