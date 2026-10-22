@@ -24,6 +24,8 @@ SERVER_PRESET="${SERVER_PRESET:-}"
 SERVER_MODIFIERS="${SERVER_MODIFIERS:-}"
 SERVER_SETKEYS="${SERVER_SETKEYS:-}"
 SERVER_ARGS="${SERVER_ARGS:-}"
+BEPINEX="${BEPINEX:-false}"
+BEPINEX_SRC="${BEPINEX_SRC:-/opt/bepinex}"
 
 SERVER_PID=""
 ARGS=()
@@ -87,6 +89,33 @@ fix_world_dir_perms() {
     fi
 }
 
+# BEPINEX=true: copy the loader from the image next to the game and preload it. Plugins and
+# their configs live in $CONFIG_DIR/bepinex (same place as lloesche/valheim-server), so they
+# survive game updates. With BEPINEX=false the copied files are left alone and never load.
+setup_bepinex() {
+    is_true "$BEPINEX" || return 0
+    [ -f "$BEPINEX_SRC/BepInEx/core/BepInEx.Preloader.dll" ] || die "BEPINEX=true but there is no BepInEx pack in $BEPINEX_SRC"
+    local mods="$CONFIG_DIR/bepinex" d
+    mkdir -p "$SERVER_DIR/BepInEx" "$mods/plugins" "$mods/config" "$mods/patchers"
+    rm -rf "$SERVER_DIR/BepInEx/core" "$SERVER_DIR/doorstop_libs"
+    cp -r "$BEPINEX_SRC/BepInEx/core" "$SERVER_DIR/BepInEx/core"
+    cp -r "$BEPINEX_SRC/doorstop_libs" "$SERVER_DIR/doorstop_libs"
+    [ -f "$mods/config/BepInEx.cfg" ] || cp "$BEPINEX_SRC/BepInEx/config/BepInEx.cfg" "$mods/config/BepInEx.cfg"
+    for d in plugins config patchers; do
+        if [ -d "$SERVER_DIR/BepInEx/$d" ] && [ ! -L "$SERVER_DIR/BepInEx/$d" ]; then
+            cp -rn "$SERVER_DIR/BepInEx/$d/." "$mods/$d/"
+            rm -rf "${SERVER_DIR:?}/BepInEx/$d"
+        fi
+        ln -sfn "$mods/$d" "$SERVER_DIR/BepInEx/$d"
+    done
+
+    export DOORSTOP_ENABLED=1
+    export DOORSTOP_TARGET_ASSEMBLY="$SERVER_DIR/BepInEx/core/BepInEx.Preloader.dll"
+    export LD_LIBRARY_PATH="$SERVER_DIR/doorstop_libs:$LD_LIBRARY_PATH"
+    export LD_PRELOAD="libdoorstop_x64.so${LD_PRELOAD:+:$LD_PRELOAD}"
+    log "BepInEx $(cat "$BEPINEX_SRC/.pack_version" 2>/dev/null || echo '?') enabled, plugins in $mods/plugins"
+}
+
 shutdown() {
     log "Shutdown requested, sending SIGINT so the server saves the world (waiting up to ${STOP_TIMEOUT}s)"
     if [ -n "$SERVER_PID" ] && kill -0 "$SERVER_PID" 2>/dev/null; then
@@ -138,6 +167,7 @@ main() {
     export SteamAppId=892970
     export LD_LIBRARY_PATH="$SERVER_DIR/linux64:${LD_LIBRARY_PATH:-}"
     export templdpath="$LD_LIBRARY_PATH"
+    setup_bepinex
 
     local visibility=private
     if is_true "$SERVER_PUBLIC"; then visibility=public; fi

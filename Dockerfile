@@ -19,7 +19,7 @@ ENV DEBIAN_FRONTEND=noninteractive \
 RUN dpkg --add-architecture i386 \
  && apt-get update \
  && apt-get install -y --no-install-recommends \
-      ca-certificates curl locales tzdata procps gosu \
+      ca-certificates curl locales tzdata procps gosu unzip \
       lib32gcc-s1 lib32stdc++6 libc6:i386 \
       libsdl2-2.0-0 libpulse0 libpulse-mainloop-glib0 libatomic1 \
  && sed -i 's/^# \(en_US.UTF-8 UTF-8\)/\1/' /etc/locale.gen \
@@ -32,6 +32,17 @@ RUN groupadd -g 1000 valheim \
  && curl -fsSL https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz \
       | tar -xz -C "$STEAMCMD_DIR" \
  && chown -R valheim:valheim "$STEAMCMD_DIR" /opt/valheim "$CONFIG_DIR" /home/valheim
+
+# BepInEx mod loader, only used when BEPINEX=true. Baked in (pinned and checksummed) so a
+# server start never downloads code. entrypoint.sh copies it next to the game files.
+ARG BEPINEX_VERSION=5.4.2351
+ARG BEPINEX_SHA256=bce631497976a93977ceb08e166712e6c31d15244956f89f17df092a9b62e29f
+RUN curl -fsSL -o /tmp/bepinex.zip "https://thunderstore.io/package/download/denikson/BepInExPack_Valheim/${BEPINEX_VERSION}/" \
+ && echo "${BEPINEX_SHA256}  /tmp/bepinex.zip" | sha256sum -c - \
+ && unzip -q /tmp/bepinex.zip 'BepInExPack_Valheim/*' -d /tmp/bepinex \
+ && mv /tmp/bepinex/BepInExPack_Valheim /opt/bepinex \
+ && echo "${BEPINEX_VERSION}" > /opt/bepinex/.pack_version \
+ && rm -rf /tmp/bepinex /tmp/bepinex.zip
 
 COPY docker-entrypoint.sh entrypoint.sh healthcheck.sh /usr/local/bin/
 RUN chmod 755 /usr/local/bin/docker-entrypoint.sh /usr/local/bin/entrypoint.sh /usr/local/bin/healthcheck.sh
