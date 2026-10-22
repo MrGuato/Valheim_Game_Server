@@ -21,7 +21,8 @@ So an existing `./config` and `./data` keep working, and you can switch back by 
 | `UPDATE_CRON`, `UPDATE_IF_IDLE` | Game updates happen on every start (`UPDATE_ON_START`). Schedule `./valheim restart` from cron |
 | `RESTART_CRON`, `RESTART_IF_IDLE` | Schedule `./valheim restart` from cron |
 | Runs as root by default | Runs as `PUID`/`PGID` (1000) by default. Set `PUID=0` to keep root |
-| BepInEx / ValheimPlus mod loaders, status HTTP endpoint, Discord hooks | Not included |
+| `BEPINEX=true` | Same variable and the same `config/bepinex/plugins` folder. The pack is baked into the image instead of downloaded on start |
+| ValheimPlus mod loader, status HTTP endpoint, Discord hooks | Not included |
 
 ## Steps
 

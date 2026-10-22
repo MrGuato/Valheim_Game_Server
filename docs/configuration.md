@@ -48,6 +48,7 @@ nano .env
 | `PGID`             | `1000`                                    | GID the server runs as |
 | `UPDATE_ON_START`  | `true`                                    | Run SteamCMD `app_update validate` on every container start |
 | `STOP_TIMEOUT`     | `120`                                     | Seconds to wait for the world save on shutdown before the process is killed |
+| `BEPINEX`          | `false`                                   | Load the BepInEx mod loader (BepInExPack_Valheim, baked into the image). Put plugin DLLs in `config/bepinex/plugins/`; their configs land in `config/bepinex/config/` |
 
 ### Game settings
 
