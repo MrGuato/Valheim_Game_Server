@@ -1,7 +1,6 @@
 [![Made With Love](https://img.shields.io/badge/Made%20with%20%E2%9D%A4%EF%B8%8F-by%20Jonathan-red)](https://github.com/MrGuato)
 [![Build and Publish](https://github.com/MrGuato/Valheim_Game_Server/actions/workflows/build.yml/badge.svg)](https://github.com/MrGuato/Valheim_Game_Server/actions/workflows/build.yml)
 [![Lint](https://github.com/MrGuato/Valheim_Game_Server/actions/workflows/lint.yml/badge.svg)](https://github.com/MrGuato/Valheim_Game_Server/actions/workflows/lint.yml)
-[![Deploy via Runner](https://github.com/MrGuato/Valheim_Game_Server/actions/workflows/deploy.yml/badge.svg)](https://github.com/MrGuato/Valheim_Game_Server/actions/workflows/deploy.yml)
 [![CodeQL](https://github.com/MrGuato/Valheim_Game_Server/actions/workflows/codeql.yml/badge.svg)](https://github.com/MrGuato/Valheim_Game_Server/actions/workflows/codeql.yml)
 [![pages-build-deployment](https://github.com/MrGuato/Valheim_Game_Server/actions/workflows/pages/pages-build-deployment/badge.svg)](https://github.com/MrGuato/Valheim_Game_Server/actions/workflows/pages/pages-build-deployment)
 [![GHCR](https://img.shields.io/badge/GHCR-container%20image-blue)](https://github.com/MrGuato/Valheim_Game_Server/pkgs/container/valheim_game_server)
@@ -22,7 +21,7 @@ I wanted to show how a gaming project can double as a practical DevOps and DevSe
 - **Infrastructure as Code**: the server can be rebuilt consistently anywhere from this repo
 - **Immutable image, moving game**: the image only ships SteamCMD. The game files are fetched and validated on every container start, so the image never goes stale between Valheim patches
 - **Security first**: `.env` stays out of git, the server runs as an unprivileged user, the firewall restricts access to trusted IPs, and every change goes through hadolint, shellcheck, CodeQL and Trivy-style scanning
-- **Automation and CI/CD**: GitHub Actions builds and publishes the image to GHCR and deploys the stack to the host through a self-hosted runner; Watchtower keeps the running image fresh
+- **Automation and CI/CD**: GitHub Actions builds and publishes the image to GHCR; Watchtower on the host picks up new images nightly
 - **Resilience**: worlds are backed up with retention and can be restored in one command
 
 This repository holds infrastructure code only. No game files, worlds or secrets are committed.
@@ -33,10 +32,9 @@ This repository holds infrastructure code only. No game files, worlds or secrets
 flowchart TD
     A[GitHub repo] -->|push main| B[GitHub Actions]
     B -->|build and push| C[(GHCR: valheim_game_server)]
-    B -->|self-hosted runner| D[Ubuntu game host]
-    D -->|docker compose up| E[valheim container]
+    D[Ubuntu game host] -->|docker compose up| E[valheim container]
+    F[Watchtower] -->|nightly image check| C
     C -->|pull| E
-    F[Watchtower] -->|nightly image check| E
     E -->|SteamCMD on start| G[(Steam: Valheim app 896660)]
     E --> H[Friends' clients]
     H -->|UDP 2456-2457, IP restricted| I[Firewall]
@@ -112,9 +110,9 @@ Writes a timestamped tarball to `./backups/` and prunes anything older than 14 d
 
 Then push the tarballs off the host (rsync, S3, restic). Restore with `./valheim restore ./backups/valheim-2026-10-15-0930.tar.gz`. Details: [Backups](https://mrguato.github.io/Valheim_Game_Server/backups.html).
 
-## Deploying from GitHub
+## Updates
 
-`.github/workflows/deploy.yml` runs on a self-hosted runner on the game host for every push to `main` (documentation-only changes are skipped). It executes a deploy script that resets the checkout to `origin/main`, pulls images and runs `docker compose up -d`. Secrets never leave the host: `.env` is gitignored and survives the reset.
+A push to `main` builds and publishes `ghcr.io/mrguato/valheim_game_server:latest`. Watchtower on the host checks for a new image every night at 05:00 (server time) and recreates the container when there is one. To update right away, run `git pull && ./valheim update` on the host. Nothing on GitHub has access to the host.
 
 ## Local builds
 

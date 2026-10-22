@@ -108,6 +108,6 @@ crontab -e
 
 See [Backups]({{ '/backups.html' | relative_url }}).
 
-## Optional: deploy from GitHub Actions
+## Updates
 
-The repo ships `.github/workflows/deploy.yml`, which runs on a self-hosted runner on the game host and executes a deploy script on every push to `main` (documentation-only pushes are ignored). The script resets the checkout to `origin/main`, pulls images and runs `docker compose up -d`. To use it, register a self-hosted runner on the host and keep your `.env` outside git (it already is). Anything not committed is wiped by the reset.
+Watchtower (in `docker-compose.yaml`) checks for a new image every night at 05:00 server time and recreates the container when there is one. To update right away, run `git pull && ./valheim update` on the host.
