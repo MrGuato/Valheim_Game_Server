@@ -38,8 +38,6 @@ I host a Valheim world for my family and friends. This is the setup it runs on, 
 
 **Safe by default.** The server runs as an unprivileged user. GitHub has no way into your host. The image is built in public and scanned on every change (hadolint, shellcheck, CodeQL, gitleaks, Trivy). The optional BepInEx pack is pinned and checksummed. See [Security]({{ '/security.html' | relative_url }}).
 
-**Easy to switch.** It uses the same variables and paths as `lloesche/valheim-server`, so moving over (or back) means changing one line. See [Migrating from lloesche]({{ '/migration.html' | relative_url }}).
-
 **Pairs with a dashboard.** [Longhouse]({{ '/dashboard.html' | relative_url }}), a separate project, adds a live web page with who's online, boss progress, leaderboards and player profiles.
 
 ## What you get
@@ -65,7 +63,6 @@ I host a Valheim world for my family and friends. This is the setup it runs on, 
 | [Backups]({{ '/backups.html' | relative_url }}) | Local, scheduled and off-host backups, restoring |
 | [Mods (BepInEx)]({{ '/mods.html' | relative_url }}) | Server-side plugins, and keeping players' achievements |
 | [Dashboard (Longhouse)]({{ '/dashboard.html' | relative_url }}) | The companion web dashboard |
-| [Migrating from lloesche]({{ '/migration.html' | relative_url }}) | Moving an existing server over, and rolling back |
 | [Security]({{ '/security.html' | relative_url }}) | What the image does to protect you, and how to report a problem |
 | [Troubleshooting]({{ '/troubleshooting.html' | relative_url }}) | Common errors and fixes |
 

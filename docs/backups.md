@@ -30,7 +30,7 @@ Schedule it:
 30 9 * * 0 cd /home/you/valheim-game-server && ./valheim backup >> logs/backup.log 2>&1
 ```
 
-If `./config` is root-owned (you run with `PUID=0`, or the lloesche image), run it with `sudo`.
+If `./config` is root-owned (you run with `PUID=0`), run it with `sudo`.
 
 The game files in `./data` and the image are reproducible and are intentionally left out.
 

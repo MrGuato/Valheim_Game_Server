@@ -34,7 +34,7 @@ The BepInExPack is baked into the image at a pinned version, and the build check
 | `config/bepinex/config/`     | Plugin settings (`.cfg`), created on first start. `BepInEx.cfg` lives here too |
 | `config/bepinex/patchers/`   | Preloader patchers, rarely needed |
 
-They sit in the same place `lloesche/valheim-server` uses, so an existing plugin folder works as is. They live under `config/`, so `./valheim backup` includes them and game updates don't wipe them.
+They live under `config/`, so `./valheim backup` includes them and game updates don't wipe them.
 
 ## Add or update a plugin
 

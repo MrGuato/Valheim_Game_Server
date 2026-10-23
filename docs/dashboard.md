@@ -13,7 +13,7 @@ nav_order: 7
 [Open the demo](https://mrguato.github.io/valheim-game-dashboard/){: .btn .btn-primary .mr-2 }
 [Longhouse on GitHub](https://github.com/MrGuato/valheim-game-dashboard){: .btn }
 
-It's a **separate project** with its own repo, image, releases and docs. This server runs fine without it, and Longhouse also works with `lloesche/valheim-server`. This page covers how the two fit together. For everything else, see the [Longhouse docs](https://mrguato.github.io/valheim-game-dashboard/docs.html).
+It's a **separate project** with its own repo, image, releases and docs. This server runs fine without it. This page covers how the two fit together. For everything else, see the [Longhouse docs](https://mrguato.github.io/valheim-game-dashboard/docs.html).
 
 ## How they connect
 

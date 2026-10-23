@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Runs as root: aligns the in-container user with PUID/PGID, fixes ownership of the
 # bind-mounted volumes, applies TZ, then drops privileges and runs entrypoint.sh.
-# PUID=0 keeps the server running as root (same behaviour as lloesche/valheim-server).
+# PUID=0 keeps the server running as root.
 set -euo pipefail
 
 PUID="${PUID:-1000}"
@@ -32,7 +32,7 @@ fi
 if [ "$(id -g valheim)" != "$PGID" ]; then groupmod -o -g "$PGID" valheim; fi
 if [ "$(id -u valheim)" != "$PUID" ]; then usermod -o -u "$PUID" valheim; fi
 
-# chown only when the top-level owner is wrong (first start, or after migrating from a root
+# chown only when the top-level owner is wrong (first start, or files left by an earlier root
 # container); recursing over ~1 GB of game files on every start would be wasteful.
 for dir in "$CONFIG_DIR" /opt/valheim "$STEAMCMD_DIR" /home/valheim; do
     if [ -d "$dir" ] && { [ "$(stat -c '%u' "$dir")" != "$PUID" ] || [ "$(stat -c '%g' "$dir")" != "$PGID" ]; }; then

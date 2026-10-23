@@ -19,7 +19,7 @@ services:
     volumes:
       - ./config:/config                 # worlds_local/, adminlist.txt, bannedlist.txt, permittedlist.txt
       - ./data:/opt/valheim              # game files from SteamCMD (~2.2 GB, reproducible)
-      - ./backups:/config/backups        # backup folder (used by scripts/backup.sh and by lloesche/valheim-server)
+      - ./backups:/config/backups        # backup tarballs from scripts/backup.sh
     cap_add:
       - SYS_NICE                         # lets the server raise its thread priority (optional)
     healthcheck:

@@ -41,7 +41,7 @@ nano .env
 
 | Variable           | Default                                   | Description |
 | ------------------ | ----------------------------------------- | ----------- |
-| `IMAGE_REPOSITORY` | `ghcr.io/mrguato/valheim-game-server`     | Image source. Set `ghcr.io/lloesche/valheim-server` to run that image with the same compose file |
+| `IMAGE_REPOSITORY` | `ghcr.io/mrguato/valheim-game-server`     | Image source. Change it to run a fork or a locally built image |
 | `IMAGE_TAG`        | `latest`                                  | Image tag. Pin a release such as `2.0.0` for production |
 | `CONTAINER_NAME`   | `valheim`                                 | Docker container name |
 | `PUID`             | `1000`                                    | UID the server runs as. Match the owner of `./config` and `./data`. `0` runs as root |

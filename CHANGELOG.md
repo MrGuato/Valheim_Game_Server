@@ -23,7 +23,6 @@ A year after 1.0, the project has its own container image and is now called **va
 ### Changed
 - Renamed the repository from `Valheim_Game_Server` to `valheim-game-server`. GitHub redirects the old URLs, but the docs site moved to `/valheim-game-server/`.
 - The default image is now `ghcr.io/mrguato/valheim-game-server`. The old name `ghcr.io/mrguato/valheim_game_server` is still published with the same tags, so existing installs keep updating.
-- Same variable names and mount paths as `lloesche/valheim-server`, so it's a drop-in replacement. `IMAGE_REPOSITORY` switches between the two.
 - Watchtower runs once a day at 05:00 (it was hourly) and only updates labeled containers.
 
 ### Removed
@@ -38,7 +37,7 @@ A year after 1.0, the project has its own container image and is now called **va
 
 ## [1.0] - 2025-09-03
 
-First release: Docker Compose setup around `lloesche/valheim-server` with Watchtower, deployed by a self-hosted GitHub Actions runner.
+First release: Docker Compose setup with Watchtower, deployed by a self-hosted GitHub Actions runner.
 
 [2.0.0]: https://github.com/MrGuato/valheim-game-server/compare/v1.0...v2.0.0
 [1.0]: https://github.com/MrGuato/valheim-game-server/releases/tag/v1.0
