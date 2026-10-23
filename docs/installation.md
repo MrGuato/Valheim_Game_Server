@@ -34,8 +34,8 @@ docker run --rm hello-world
 ## 2. Clone the repo
 
 ```bash
-git clone https://github.com/MrGuato/Valheim_Game_Server.git
-cd Valheim_Game_Server
+git clone https://github.com/MrGuato/valheim-game-server.git
+cd valheim-game-server
 chmod +x valheim
 ```
 
@@ -93,7 +93,7 @@ Note: if you forwarded the ports for specific IPs only, the server will not show
 
 ```bash
 ./valheim build
-IMAGE_REPOSITORY=valheim_game_server IMAGE_TAG=dev ./valheim start
+IMAGE_REPOSITORY=valheim-game-server IMAGE_TAG=dev ./valheim start
 ```
 
 ## Optional: scheduled backups
@@ -103,7 +103,7 @@ crontab -e
 ```
 
 ```cron
-30 9 * * 0 cd /home/game_server/Valheim_Game_Server && ./valheim backup >> logs/backup.log 2>&1
+30 9 * * 0 cd /home/you/valheim-game-server && ./valheim backup >> logs/backup.log 2>&1
 ```
 
 See [Backups]({{ '/backups.html' | relative_url }}).

@@ -1,20 +1,29 @@
-title: Valheim Dedicated Server
-description: Self-hosted Valheim dedicated server on Linux. Docker, SteamCMD, GitHub Actions. By MrGuato.
+title: Valheim Game Server
+description: A self-hosted Valheim dedicated server you can set up in five minutes and trust with your world. Docker, one CLI, backups, non-root.
 remote_theme: just-the-docs/just-the-docs
 url: https://mrguato.github.io
-baseurl: /Valheim_Game_Server
+baseurl: /valheim-game-server
+logo: /assets/logo.svg
+
+# GitHub / social card
+image: /assets/social-preview.png
 
 color_scheme: dark
 
 aux_links:
-  GitHub repo:
-    - https://github.com/MrGuato/Valheim_Game_Server
-  Container image:
-    - https://github.com/MrGuato/Valheim_Game_Server/pkgs/container/valheim_game_server
+  GitHub:
+    - https://github.com/MrGuato/valheim-game-server
+  Releases:
+    - https://github.com/MrGuato/valheim-game-server/releases
+  Longhouse dashboard:
+    - https://github.com/MrGuato/valheim-game-dashboard
 
 aux_links_new_tab: true
 
 heading_anchors: true
+
+mermaid:
+  version: "10.9.1"
 
 search_enabled: true
 search:
@@ -23,7 +32,7 @@ search:
   preview_words_before: 5
   preview_words_after: 10
 
-footer_content: 'Built by <a href="https://github.com/MrGuato">MrGuato</a>.'
+footer_content: 'Built by <a href="https://github.com/MrGuato">MrGuato</a>. MIT licensed. Not affiliated with Iron Gate or Coffee Stain.'
 
 plugins:
   - jekyll-remote-theme

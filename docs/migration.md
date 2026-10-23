@@ -1,7 +1,7 @@
 ---
 title: Migrating from lloesche
 layout: default
-nav_order: 6
+nav_order: 8
 ---
 
 # Migrating from lloesche/valheim-server
@@ -32,7 +32,7 @@ So an existing `./config` and `./data` keep working, and you can switch back by 
    ```
 2. In `.env`, point at this image (or delete the two lines to use the compose default):
    ```ini
-   IMAGE_REPOSITORY=ghcr.io/mrguato/valheim_game_server
+   IMAGE_REPOSITORY=ghcr.io/mrguato/valheim-game-server
    IMAGE_TAG=latest
    ```
    Decide who the server runs as. `PUID=1000` (default) makes the container chown `./config` and `./data` to 1000 on its first start and fixes world folders that lloesche created without the execute bit. `PUID=0` keeps everything root-owned, exactly as before.

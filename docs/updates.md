@@ -34,14 +34,26 @@ Watchtower's `--schedule` takes six cron fields with seconds first, so the compo
 
 Remove the `watchtower` service from the compose file if you prefer manual updates.
 
-## Pin to a specific image tag
+## Pin a release
+
+`latest` follows `main`. To update only when you choose, pin a release:
 
 ```ini
-IMAGE_TAG=v1.0.0
+IMAGE_TAG=2.0.0
 ```
 
 ```bash
 ./valheim update
+```
+
+Image tags drop the `v` from the git tag: release `v2.0.0` publishes `2.0.0` and `2.0`. Pinning `2.0` picks up patch releases (2.0.1, 2.0.2) but never 2.1. Watchtower follows whatever tag you pin. Release notes are on the [releases page](https://github.com/MrGuato/valheim-game-server/releases) and in the [changelog](https://github.com/MrGuato/valheim-game-server/blob/main/CHANGELOG.md).
+
+## Image name
+
+The image is `ghcr.io/mrguato/valheim-game-server`. Before 2.0.0 it was `ghcr.io/mrguato/valheim_game_server`. That name still gets every build with the same tags, so older `.env` files keep updating. To move to the new name:
+
+```ini
+IMAGE_REPOSITORY=ghcr.io/mrguato/valheim-game-server
 ```
 
 ## Skip SteamCMD on start
@@ -63,8 +75,8 @@ exit
 
 ## Scheduled restarts
 
-A nightly restart picks up game patches and clears memory:
+A nightly restart picks up game patches and clears memory. It disconnects anyone still playing, so pick an hour when your group is asleep:
 
 ```cron
-10 5 * * * cd /home/game_server/Valheim_Game_Server && ./valheim restart >> logs/restart.log 2>&1
+10 5 * * * cd /home/you/valheim-game-server && ./valheim restart >> logs/restart.log 2>&1
 ```

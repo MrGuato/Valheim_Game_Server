@@ -27,7 +27,7 @@ BACKUP_DIR=/srv/backups RETENTION_DAYS=60 ./valheim backup
 Schedule it:
 
 ```cron
-30 9 * * 0 cd /home/game_server/Valheim_Game_Server && ./valheim backup >> logs/backup.log 2>&1
+30 9 * * 0 cd /home/you/valheim-game-server && ./valheim backup >> logs/backup.log 2>&1
 ```
 
 If `./config` is root-owned (you run with `PUID=0`, or the lloesche image), run it with `sudo`.
