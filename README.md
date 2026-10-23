@@ -60,9 +60,6 @@ There are plenty of ways to run a Valheim server. I built this one because I hos
 - The optional BepInEx mod loader is baked into the image at a pinned version with a SHA-256 check, so a server start never downloads and runs code from the internet.
 - Versioned releases (`IMAGE_TAG=2.0.0`) let you pin exactly what you run.
 
-**Easy to switch to and from**
-- It's a drop-in replacement for `lloesche/valheim-server`: same variable names, same mount paths. I moved my own live world over with about 2.5 minutes of downtime. If you don't like it, going back takes one line in `.env`. See [Migrating from lloesche](https://mrguato.github.io/valheim-game-server/migration.html).
-
 ### Compared with the usual options
 
 |                                   | This repo | Manual SteamCMD + systemd | Rented game host |
@@ -77,7 +74,7 @@ There are plenty of ways to run a Valheim server. I built this one because I hos
 | Live web dashboard                | ✅ [Longhouse](#pair-it-with-longhouse) | ❌ | basic panel |
 | Monthly cost                      | your hardware | your hardware | a monthly fee |
 
-To be fair to `lloesche/valheim-server`: it has more built in, like in-container backup and restart schedules, a status HTTP endpoint, ValheimPlus and Discord hooks. If you need those, use it. This repo stays small on purpose, so you can read all of it in an evening and know what runs on your machine.
+This repo stays small on purpose, so you can read all of it in an evening and know what runs on your machine.
 
 ## Pair it with Longhouse
 
@@ -149,7 +146,6 @@ The full guide is at **[mrguato.github.io/valheim-game-server](https://mrguato.g
 - [Backups](https://mrguato.github.io/valheim-game-server/backups.html): local, scheduled, off-host, restore
 - [Mods (BepInEx)](https://mrguato.github.io/valheim-game-server/mods.html): server-side plugins without breaking achievements
 - [Dashboard (Longhouse)](https://mrguato.github.io/valheim-game-server/dashboard.html): the companion web dashboard
-- [Migrating from lloesche](https://mrguato.github.io/valheim-game-server/migration.html)
 - [Security](https://mrguato.github.io/valheim-game-server/security.html) and [Troubleshooting](https://mrguato.github.io/valheim-game-server/troubleshooting.html)
 
 ## What's in the repo

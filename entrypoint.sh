@@ -90,8 +90,7 @@ fix_world_dir_perms() {
 }
 
 # BEPINEX=true: copy the loader from the image next to the game and preload it. Plugins and
-# their configs live in $CONFIG_DIR/bepinex (same place as lloesche/valheim-server), so they
-# survive game updates. With BEPINEX=false the copied files are left alone and never load.
+# their configs live in $CONFIG_DIR/bepinex, so they survive game updates. With BEPINEX=false the copied files are left alone and never load.
 setup_bepinex() {
     is_true "$BEPINEX" || return 0
     [ -f "$BEPINEX_SRC/BepInEx/core/BepInEx.Preloader.dll" ] || die "BEPINEX=true but there is no BepInEx pack in $BEPINEX_SRC"

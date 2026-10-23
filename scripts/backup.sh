@@ -27,7 +27,7 @@ done
 
 echo "[backup] Creating $ARCHIVE"
 if ! tar --warning=no-file-changed -czf "$ARCHIVE" "${ITEMS[@]}"; then
-    echo "[backup] ERROR: tar failed. If ./config is root-owned (lloesche image or PUID=0), run: sudo ./valheim backup"
+    echo "[backup] ERROR: tar failed. If ./config is root-owned (PUID=0), run: sudo ./valheim backup"
     rm -f "$ARCHIVE"
     exit 1
 fi
