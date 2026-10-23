@@ -7,18 +7,19 @@ on:
     paths-ignore:
       - 'docs/**'
       - '*.md'
-      - 'index.html'
   pull_request:
     branches: [main]
     paths-ignore:
       - 'docs/**'
       - '*.md'
-      - 'index.html'
   workflow_dispatch:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository }}
+  IMAGE_NAME: mrguato/valheim-game-server
+  # The repo was called Valheim_Game_Server until v2.0.0. Keep publishing the old image
+  # name too, so servers (and Watchtower) that still pull it keep getting updates.
+  LEGACY_IMAGE_NAME: mrguato/valheim_game_server
 
 jobs:
   build:
@@ -44,7 +45,9 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          images: |
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+            ${{ env.REGISTRY }}/${{ env.LEGACY_IMAGE_NAME }}
           tags: |
             type=ref,event=branch
             type=ref,event=pr

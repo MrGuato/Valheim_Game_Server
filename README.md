@@ -1,149 +1,186 @@
-[![Made With Love](https://img.shields.io/badge/Made%20with%20%E2%9D%A4%EF%B8%8F-by%20Jonathan-red)](https://github.com/MrGuato)
-[![Build and Publish](https://github.com/MrGuato/Valheim_Game_Server/actions/workflows/build.yml/badge.svg)](https://github.com/MrGuato/Valheim_Game_Server/actions/workflows/build.yml)
-[![Lint](https://github.com/MrGuato/Valheim_Game_Server/actions/workflows/lint.yml/badge.svg)](https://github.com/MrGuato/Valheim_Game_Server/actions/workflows/lint.yml)
-[![CodeQL](https://github.com/MrGuato/Valheim_Game_Server/actions/workflows/codeql.yml/badge.svg)](https://github.com/MrGuato/Valheim_Game_Server/actions/workflows/codeql.yml)
-[![pages-build-deployment](https://github.com/MrGuato/Valheim_Game_Server/actions/workflows/pages/pages-build-deployment/badge.svg)](https://github.com/MrGuato/Valheim_Game_Server/actions/workflows/pages/pages-build-deployment)
-[![GHCR](https://img.shields.io/badge/GHCR-container%20image-blue)](https://github.com/MrGuato/Valheim_Game_Server/pkgs/container/valheim_game_server)
-[![Known Vulnerabilities](https://snyk.io/test/github/MrGuato/Valheim_Game_Server/badge.svg)](https://snyk.io/test/github/MrGuato/Valheim_Game_Server)
-![GitHub Repo stars](https://img.shields.io/github/stars/MrGuato/Valheim_Game_Server?style=social)
-[![Last Commit](https://img.shields.io/github/last-commit/MrGuato/Valheim_Game_Server)]()
+<p align="center">
+  <img src="docs/assets/logo.svg" width="140" alt="Valheim Game Server logo: a round Viking shield with a server in the boss">
+</p>
 
-# Valheim Dedicated Server
+<h1 align="center">Valheim Game Server</h1>
 
-Self-hosted Valheim dedicated server for Linux. Docker image built on Ubuntu 22.04 with SteamCMD, configured entirely through `.env`, with persistent worlds, healthchecks, backups and a single CLI for everything. The repo also deploys itself to the game host from GitHub Actions.
+<p align="center">
+  A self-hosted Valheim dedicated server you can set up in five minutes and trust with your world.<br>
+  Docker image, one CLI, real backups, no root, no surprises.
+</p>
 
-Full guide: [mrguato.github.io/Valheim_Game_Server](https://mrguato.github.io/Valheim_Game_Server/)
+<p align="center">
+  <a href="https://mrguato.github.io/valheim-game-server/"><b>Docs</b></a> ·
+  <a href="https://github.com/MrGuato/valheim-game-server/pkgs/container/valheim-game-server"><b>Container image</b></a> ·
+  <a href="https://github.com/MrGuato/valheim-game-server/releases"><b>Releases</b></a> ·
+  <a href="https://github.com/MrGuato/valheim-game-dashboard"><b>Longhouse dashboard</b></a>
+</p>
 
-## Why this exists
+<p align="center">
+  <a href="https://github.com/MrGuato/valheim-game-server/releases"><img src="https://img.shields.io/github/v/release/MrGuato/valheim-game-server" alt="Release"></a>
+  <a href="https://github.com/MrGuato/valheim-game-server/actions/workflows/build.yml"><img src="https://github.com/MrGuato/valheim-game-server/actions/workflows/build.yml/badge.svg" alt="Build and Publish"></a>
+  <a href="https://github.com/MrGuato/valheim-game-server/actions/workflows/lint.yml"><img src="https://github.com/MrGuato/valheim-game-server/actions/workflows/lint.yml/badge.svg" alt="Lint"></a>
+  <a href="https://github.com/MrGuato/valheim-game-server/actions/workflows/security.yml"><img src="https://github.com/MrGuato/valheim-game-server/actions/workflows/security.yml/badge.svg" alt="Security"></a>
+  <a href="https://github.com/MrGuato/valheim-game-server/actions/workflows/codeql.yml"><img src="https://github.com/MrGuato/valheim-game-server/actions/workflows/codeql.yml/badge.svg" alt="CodeQL"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/github/license/MrGuato/valheim-game-server" alt="License: MIT"></a>
+  <a href="https://github.com/MrGuato/valheim-game-server/commits/main"><img src="https://img.shields.io/github/last-commit/MrGuato/valheim-game-server" alt="Last commit"></a>
+</p>
 
-I wanted to show how a gaming project can double as a practical DevOps and DevSecOps case study. Hosting Valheim this way demonstrates:
+---
 
-- **Infrastructure as Code**: the server can be rebuilt consistently anywhere from this repo
-- **Immutable image, moving game**: the image only ships SteamCMD. The game files are fetched and validated on every container start, so the image never goes stale between Valheim patches
-- **Security first**: `.env` stays out of git, the server runs as an unprivileged user, the firewall restricts access to trusted IPs, and every change goes through hadolint, shellcheck, CodeQL and Trivy-style scanning
-- **Automation and CI/CD**: GitHub Actions builds and publishes the image to GHCR; Watchtower on the host picks up new images nightly
-- **Resilience**: worlds are backed up with retention and can be restored in one command
+```bash
+git clone https://github.com/MrGuato/valheim-game-server.git
+cd valheim-game-server
+./valheim setup     # asks a few questions, writes .env
+./valheim start     # pulls the image, downloads the game, tails the log
+```
 
-This repository holds infrastructure code only. No game files, worlds or secrets are committed.
+When the log says `Game server connected`, your friends join with `your.public.ip:2456`. That's it.
 
-## Architecture
+## Why this one
+
+There are plenty of ways to run a Valheim server. I built this one because I host a world for my family and friends and wanted something I could stop thinking about. That world (300,000+ objects and counting) runs on this image today, and every feature below is there because I needed it.
+
+**Your world comes first**
+- `./valheim stop` and Docker stops send Valheim the signal it saves on, then wait up to two minutes for `World save done` before anything gets killed.
+- `./valheim backup` makes a verified tarball of every world and player list with retention, and `./valheim restore` puts one back (it stops the server first so nothing overwrites it).
+- Valheim 1.0's chunked save format sometimes creates world folders the server can't read on the next start. The entrypoint repairs their permissions on every start, so you don't come back to an empty new world.
+- Bad settings fail loudly before the game starts. Valheim's own password rules (5+ characters, not inside the server name) are checked up front, with a clear message.
+
+**Set it up once, then forget it**
+- One CLI for everything: `setup`, `start`, `status`, `logs`, `backup`, `restore`, `update`, `shell`. `make` works too.
+- The image only carries SteamCMD. The game is checked and patched on every start, so the image never goes stale when Iron Gate ships an update. A restart is a game update.
+- Watchtower checks for a new image once a night at 05:00 and only touches this container.
+- Every setting lives in one `.env` file, with a [documented reference](https://mrguato.github.io/valheim-game-server/configuration.html) for presets, modifiers and world keys.
+
+**Safe by default**
+- The server runs as an unprivileged user (UID 1000), not root.
+- Nothing from GitHub can reach your host: there's no self-hosted runner or deploy hook. Your host pulls a public image, and that's the only connection.
+- The image is built in the open by GitHub Actions. Every change goes through hadolint, shellcheck, CodeQL, gitleaks and Trivy (config and image scans), and Dependabot keeps base images and actions current.
+- The optional BepInEx mod loader is baked into the image at a pinned version with a SHA-256 check, so a server start never downloads and runs code from the internet.
+- Versioned releases (`IMAGE_TAG=2.0.0`) let you pin exactly what you run.
+
+**Easy to switch to and from**
+- It's a drop-in replacement for `lloesche/valheim-server`: same variable names, same mount paths. I moved my own live world over with about 2.5 minutes of downtime. If you don't like it, going back takes one line in `.env`. See [Migrating from lloesche](https://mrguato.github.io/valheim-game-server/migration.html).
+
+### Compared with the usual options
+
+|                                   | This repo | Manual SteamCMD + systemd | Rented game host |
+| --------------------------------- | :-------: | :-----------------------: | :--------------: |
+| Five-minute setup                 | ✅ | ❌ | ✅ |
+| You own the world files           | ✅ | ✅ | depends |
+| Game patches on restart           | ✅ | manual | ✅ |
+| Saves the world on shutdown       | ✅ | if you script it | ✅ |
+| Backups with restore              | ✅ one command | DIY | usually |
+| Runs as non-root                  | ✅ | if you set it up | n/a |
+| Server-side mods (BepInEx)        | ✅ opt-in | manual | some |
+| Live web dashboard                | ✅ [Longhouse](#pair-it-with-longhouse) | ❌ | basic panel |
+| Monthly cost                      | your hardware | your hardware | a monthly fee |
+
+To be fair to `lloesche/valheim-server`: it has more built in, like in-container backup and restart schedules, a status HTTP endpoint, ValheimPlus and Discord hooks. If you need those, use it. This repo stays small on purpose, so you can read all of it in an evening and know what runs on your machine.
+
+## Pair it with Longhouse
+
+<p align="center">
+  <a href="https://mrguato.github.io/valheim-game-dashboard/"><img src="docs/assets/longhouse-dashboard.png" width="820" alt="Longhouse dashboard demo with mock data: server status, world day, boss progression and weekly stats"></a>
+</p>
+
+[**Longhouse**](https://github.com/MrGuato/valheim-game-dashboard) is my web dashboard for Valheim servers, kept in its own repo. It shows who's online, the in-game day, boss progress, leaderboards, a "when do we play" heatmap and armory-style player profiles. [Try the demo](https://mrguato.github.io/valheim-game-dashboard/) (mock data).
+
+The two are separate projects, and neither needs the other. They're built to fit together:
+
+- Longhouse runs as its own container next to this one. It reads the server log through a read-only Docker socket proxy and never touches your world files.
+- Set `BEPINEX=true` here and drop the Longhouse server plugin into `config/bepinex/plugins/` to add character figures, gear, biomes, kills per creature and pieces built.
+- The plugin goes on the server only. Players install nothing, so it can't affect their Steam achievements.
+
+Setup steps: [Dashboard (Longhouse)](https://mrguato.github.io/valheim-game-server/dashboard.html).
+
+## Everyday commands
+
+```bash
+./valheim status       # container, health, game version, players in the last log sample
+./valheim logs         # follow the log
+./valheim restart      # save, restart, pick up game patches
+./valheim update       # pull the newest image and recreate
+./valheim backup       # verified tarball of worlds and player lists into ./backups
+./valheim restore FILE # put a backup back
+./valheim stop         # save the world and stop
+./valheim shell        # shell inside the container
+./valheim help         # everything else
+```
+
+## How it fits together
 
 ```mermaid
-flowchart TD
-    A[GitHub repo] -->|push main| B[GitHub Actions]
-    B -->|build and push| C[(GHCR: valheim_game_server)]
-    D[Ubuntu game host] -->|docker compose up| E[valheim container]
-    F[Watchtower] -->|nightly image check| C
-    C -->|pull| E
-    E -->|SteamCMD on start| G[(Steam: Valheim app 896660)]
-    E --> H[Friends' clients]
-    H -->|UDP 2456-2457, IP restricted| I[Firewall]
+flowchart LR
+    subgraph GitHub
+      A[This repo] -->|push or tag| B[Actions: lint, scan, build]
+      B --> C[(GHCR image)]
+    end
+    subgraph Your host
+      W[Watchtower, nightly] -->|pull| C
+      W --> V[valheim container]
+      V -->|SteamCMD on start| S[(Steam: app 896660)]
+      V --- D[(./config: worlds and player lists)]
+      K[./valheim backup] --> D
+      L[Longhouse, optional] -.->|reads logs| V
+    end
+    P[Players] -->|UDP 2456-2457| V
 ```
 
 ## Requirements
 
 | Component      | Minimum |
 | -------------- | ------- |
-| OS             | Ubuntu 22.04+ or Debian 12+ |
-| Docker         | 24.x or newer |
-| Docker Compose | v2 (`docker compose`) |
-| RAM            | 4 GB (8 GB recommended for 5+ players) |
+| OS             | Ubuntu 22.04+ or Debian 12+ (any Linux with Docker should work) |
+| Docker         | 24.x or newer, with Compose v2 |
+| CPU            | 2 cores. Valheim leans on one thread, so clock speed matters more than core count |
+| RAM            | 4 GB, 8 GB for 5+ players or big worlds |
 | Disk           | 6 GB free |
-| Network        | UDP 2456-2457 forwarded (2458 for crossplay) |
+| Network        | UDP 2456-2457 forwarded (2458 too for crossplay) |
 
-## Quick start
+## Documentation
 
-```bash
-git clone https://github.com/MrGuato/Valheim_Game_Server.git
-cd Valheim_Game_Server
-chmod +x valheim
-./valheim setup
-./valheim start
-```
+The full guide is at **[mrguato.github.io/valheim-game-server](https://mrguato.github.io/valheim-game-server/)**:
 
-`setup` writes a `.env` and creates the data folders. `start` pulls the image, launches the container and tails the logs. The first boot downloads about 2.2 GB of game files via SteamCMD. When you see `Game server connected`, players can join with `your.public.ip:2456`.
+- [Installation](https://mrguato.github.io/valheim-game-server/installation.html): fresh Ubuntu host to first login
+- [Configuration](https://mrguato.github.io/valheim-game-server/configuration.html): every variable, presets, modifiers, player lists
+- [Updates](https://mrguato.github.io/valheim-game-server/updates.html): game patches, image updates, pinning a release
+- [Backups](https://mrguato.github.io/valheim-game-server/backups.html): local, scheduled, off-host, restore
+- [Mods (BepInEx)](https://mrguato.github.io/valheim-game-server/mods.html): server-side plugins without breaking achievements
+- [Dashboard (Longhouse)](https://mrguato.github.io/valheim-game-server/dashboard.html): the companion web dashboard
+- [Migrating from lloesche](https://mrguato.github.io/valheim-game-server/migration.html)
+- [Security](https://mrguato.github.io/valheim-game-server/security.html) and [Troubleshooting](https://mrguato.github.io/valheim-game-server/troubleshooting.html)
 
-## Common operations
-
-```bash
-./valheim status       # container, health, server info, last known player count
-./valheim logs         # tail logs
-./valheim restart      # save the world and restart (also picks up game patches)
-./valheim update       # pull the latest image and recreate
-./valheim backup       # snapshot worlds and player lists to ./backups
-./valheim restore FILE # restore a backup tarball
-./valheim stop         # save the world and stop
-./valheim down         # remove the containers (data persists)
-./valheim shell        # bash inside the container
-./valheim help         # full command list
-```
-
-`make` works too (`make start`, `make logs`, ...).
-
-## Configuration
-
-Everything lives in `.env`. Edit it, then recreate the container:
-
-```bash
-nano .env
-./valheim update
-```
-
-Variable reference: [Configuration](https://mrguato.github.io/Valheim_Game_Server/configuration.html). The variable names match `lloesche/valheim-server`, so an existing `.env` keeps working, and `IMAGE_REPOSITORY` lets you run either image with the same compose file. See [Migrating from lloesche](https://mrguato.github.io/Valheim_Game_Server/migration.html).
-
-## Updates
-
-Game patches: `./valheim restart` (SteamCMD validates and updates on every start).
-Image: `./valheim update`, or let Watchtower do it nightly at 05:00. Details: [Updates](https://mrguato.github.io/Valheim_Game_Server/updates.html).
-
-## Backups
-
-```bash
-./valheim backup
-```
-
-Writes a timestamped tarball to `./backups/` and prunes anything older than 14 days. Schedule it with cron:
-
-```cron
-30 9 * * 0 cd /home/game_server/Valheim_Game_Server && ./valheim backup >> logs/backup.log 2>&1
-```
-
-Then push the tarballs off the host (rsync, S3, restic). Restore with `./valheim restore ./backups/valheim-2026-10-15-0930.tar.gz`. Details: [Backups](https://mrguato.github.io/Valheim_Game_Server/backups.html).
-
-## Updates
-
-A push to `main` builds and publishes `ghcr.io/mrguato/valheim_game_server:latest`. Watchtower on the host checks for a new image every night at 05:00 (server time) and recreates the container when there is one. To update right away, run `git pull && ./valheim update` on the host. Nothing on GitHub has access to the host.
-
-## Local builds
-
-The default config pulls the prebuilt image from GHCR. To build from source:
-
-```bash
-./valheim build
-IMAGE_REPOSITORY=valheim_game_server IMAGE_TAG=dev ./valheim start
-```
-
-## Layout
+## What's in the repo
 
 ```
-Valheim_Game_Server/
-+-- valheim                  CLI wrapper (run this)
-+-- Dockerfile               Ubuntu 22.04 + SteamCMD
-+-- docker-compose.yaml      Production compose (image from GHCR) + Watchtower
+valheim-game-server/
++-- valheim                  The CLI (run this)
++-- Dockerfile               Ubuntu 22.04 + SteamCMD + pinned BepInEx pack
++-- docker-compose.yaml      The server (image from GHCR) + Watchtower
 +-- docker-compose.dev.yml   Override for local builds
-+-- docker-entrypoint.sh     Root: PUID/PGID, volume ownership, drop privileges
-+-- entrypoint.sh            Runtime: validation, SteamCMD update, server start, save on stop
++-- docker-entrypoint.sh     Starts as root: fixes volume ownership, drops to PUID/PGID
++-- entrypoint.sh            Validates settings, updates the game, starts it, saves on stop
 +-- healthcheck.sh           Container health probe
-+-- Makefile                 Thin wrapper around ./valheim
-+-- .env.example             Copy to .env via ./valheim setup
-+-- scripts/
-|   +-- backup.sh            Tarball worlds and player lists with retention
-|   +-- restore.sh           Restore from a backup tarball
-+-- docs/                    GitHub Pages site (just-the-docs)
-+-- .github/workflows/       Build and publish to GHCR, hadolint + shellcheck, CodeQL, deploy
-+-- config/                  Worlds and player lists (created on first run)
-+-- data/                    Game files from SteamCMD (created on first run)
-+-- backups/                 Backup tarballs
++-- scripts/backup.sh        Verified tarballs with retention
++-- scripts/restore.sh       Restore from a tarball
++-- docs/                    The documentation site (just-the-docs)
++-- .github/workflows/       Build and publish, lint, security scans, CodeQL
 ```
+
+Only infrastructure code lives here: no game files, worlds, server addresses or secrets. `.env` is gitignored.
+
+## Releases and versioning
+
+`latest` follows `main`. Tagged releases (`2.0.0`, `2.0`) stay put, so set `IMAGE_TAG=2.0.0` to pin one and update when you choose. What changed in each release is in the [CHANGELOG](CHANGELOG.md) and on the [releases page](https://github.com/MrGuato/valheim-game-server/releases).
+
+## Contributing and security
+
+Issues and pull requests are welcome. For a security problem, please follow [SECURITY.md](SECURITY.md) instead of opening a public issue.
+
+## License
+
+[MIT](LICENSE). Valheim is a trademark of Iron Gate AB. This project isn't affiliated with Iron Gate or Coffee Stain; it downloads the official dedicated server from Steam at runtime and doesn't redistribute any game files.
 
 See you in the Viking lands!

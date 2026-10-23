@@ -4,7 +4,7 @@
 # stale between Valheim patches. Saves live in /config, game files in /opt/valheim.
 FROM ubuntu:22.04
 
-LABEL org.opencontainers.image.source="https://github.com/MrGuato/Valheim_Game_Server" \
+LABEL org.opencontainers.image.source="https://github.com/MrGuato/valheim-game-server" \
       org.opencontainers.image.description="Valheim Dedicated Server (SteamCMD, native Linux build) by MrGuato" \
       org.opencontainers.image.authors="MrGuato"
 

@@ -1,7 +1,7 @@
 ---
 title: Troubleshooting
 layout: default
-nav_order: 7
+nav_order: 10
 ---
 
 # Troubleshooting
@@ -76,11 +76,11 @@ Large worlds pause for a moment during saves. Raise `SAVE_INTERVAL` (seconds) to
 
 Symptom: `Error response from daemon: ... denied`.
 
-The GHCR package must be public: profile → Packages → `valheim_game_server` → Package settings → Change visibility. Or build locally:
+The GHCR package must be public: profile → Packages → `valheim-game-server` → Package settings → Change visibility. Or build locally:
 
 ```bash
 ./valheim build
-IMAGE_REPOSITORY=valheim_game_server IMAGE_TAG=dev ./valheim start
+IMAGE_REPOSITORY=valheim-game-server IMAGE_TAG=dev ./valheim start
 ```
 
 ## Watchtower keeps restarting

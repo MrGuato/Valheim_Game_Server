@@ -1,6 +1,6 @@
 services:
   valheim:
-    image: ${IMAGE_REPOSITORY:-ghcr.io/mrguato/valheim_game_server}:${IMAGE_TAG:-latest}
+    image: ${IMAGE_REPOSITORY:-ghcr.io/mrguato/valheim-game-server}:${IMAGE_TAG:-latest}
     pull_policy: always
     container_name: ${CONTAINER_NAME:-valheim}
     restart: unless-stopped

@@ -194,7 +194,7 @@ cmd_build() {
     log "Building the image locally (docker-compose.dev.yml override)"
     docker compose -f docker-compose.yaml -f docker-compose.dev.yml build "$@"
     ok "Built. To run the local image:"
-    echo "  IMAGE_REPOSITORY=valheim_game_server IMAGE_TAG=dev ./valheim start"
+    echo "  IMAGE_REPOSITORY=valheim-game-server IMAGE_TAG=dev ./valheim start"
 }
 
 cmd_help() {
