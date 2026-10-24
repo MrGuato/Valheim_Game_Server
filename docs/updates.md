@@ -50,7 +50,7 @@ Image tags drop the `v` from the git tag: release `v2.0.0` publishes `2.0.0` and
 
 ## Image name
 
-The image is `ghcr.io/mrguato/valheim-game-server`. Before 2.0.0 it was `ghcr.io/mrguato/valheim_game_server`. That name still gets every build with the same tags, so older `.env` files keep updating. To move to the new name:
+The image is `ghcr.io/mrguato/valheim-game-server`. Before 2.0.0 it was `ghcr.io/mrguato/valheim_game_server`. That name stopped receiving builds on 2026-10-24 (its last build is 2.0.0 on Ubuntu 22.04), so an `.env` that still points at it no longer updates. To move to the new name:
 
 ```ini
 IMAGE_REPOSITORY=ghcr.io/mrguato/valheim-game-server
