@@ -39,7 +39,7 @@ Remove the `watchtower` service from the compose file if you prefer manual updat
 `latest` follows `main`. To update only when you choose, pin a release:
 
 ```ini
-IMAGE_TAG=2.0.0
+IMAGE_TAG=2.1.0
 ```
 
 ```bash

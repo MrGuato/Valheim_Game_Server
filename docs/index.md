@@ -51,7 +51,7 @@ I host a Valheim world for my family and friends. This is the setup it runs on, 
 - Crossplay for Xbox and Microsoft Store players
 - Opt-in BepInEx for server-side plugins
 - Healthcheck, log rotation and nightly Watchtower updates
-- Versioned releases you can pin (`IMAGE_TAG=2.0.0`)
+- Versioned releases you can pin (`IMAGE_TAG=2.1.0`)
 
 ## Pages
 

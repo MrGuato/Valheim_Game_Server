@@ -26,7 +26,7 @@ A game server is a machine on the internet that your friends connect to. Here's 
 - **Firewall.** Open only UDP 2456-2457 (and 2458 with crossplay). Where you can, limit the router forward to your friends' IPs. Direct connect still works, and the server just won't appear in the public list.
 - **Admins.** Keep `config/adminlist.txt` short. Admins can use the server's console commands.
 - **Whitelist.** For a private group, list your friends' Steam64 IDs in `config/permittedlist.txt`. Nobody else can join, even with the password.
-- **Pin a release** (`IMAGE_TAG=2.0.0`) if you'd rather review updates before they run, instead of following `latest`.
+- **Pin a release** (`IMAGE_TAG=2.1.0`) if you'd rather review updates before they run, instead of following `latest`.
 - **Off-host backups.** See [Backups]({{ '/backups.html' | relative_url }}).
 - **Mods.** BepInEx plugins run with the server's permissions. Install only plugins you trust, from their official pages.
 
