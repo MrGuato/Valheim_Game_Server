@@ -2,7 +2,7 @@
 # The image is immutable: it ships SteamCMD only. The game files are downloaded and
 # validated on every container start (UPDATE_ON_START=true), so the image never goes
 # stale between Valheim patches. Saves live in /config, game files in /opt/valheim.
-FROM ubuntu:22.04
+FROM ubuntu:26.04
 
 LABEL org.opencontainers.image.source="https://github.com/MrGuato/valheim-game-server" \
       org.opencontainers.image.description="Valheim Dedicated Server (SteamCMD, native Linux build) by MrGuato" \
@@ -26,7 +26,9 @@ RUN dpkg --add-architecture i386 \
  && locale-gen \
  && rm -rf /var/lib/apt/lists/*
 
-RUN groupadd -g 1000 valheim \
+# Ubuntu 24.04+ images ship a default "ubuntu" user on UID/GID 1000; make room for ours
+RUN (id ubuntu >/dev/null 2>&1 && userdel -r ubuntu || true) \
+ && groupadd -g 1000 valheim \
  && useradd -u 1000 -g 1000 -m -s /bin/bash valheim \
  && mkdir -p "$STEAMCMD_DIR" "$SERVER_DIR" "$CONFIG_DIR" \
  && curl -fsSL https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz \
