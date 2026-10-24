@@ -24,6 +24,8 @@
   <a href="https://github.com/MrGuato/valheim-game-server/actions/workflows/codeql.yml"><img src="https://github.com/MrGuato/valheim-game-server/actions/workflows/codeql.yml/badge.svg" alt="CodeQL"></a>
   <a href="LICENSE"><img src="https://img.shields.io/github/license/MrGuato/valheim-game-server" alt="License: MIT"></a>
   <a href="https://github.com/MrGuato/valheim-game-server/commits/main"><img src="https://img.shields.io/github/last-commit/MrGuato/valheim-game-server" alt="Last commit"></a>
+  <a href="https://github.com/MrGuato/valheim-game-server/pkgs/container/valheim-game-server"><img src="https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fgithub.com%2Fipitio%2Fbackage%2Fraw%2Findex%2FMrGuato%2Fvalheim-game-server%2Fvalheim-game-server.json&query=%24.downloads&label=pulls&logo=docker&logoColor=white&color=2496ed" alt="Container pulls"></a>
+  <a href="https://github.com/MrGuato/valheim-game-server"><img src="https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fraw.githubusercontent.com%2FMrGuato%2Fvalheim-game-server%2Ftraffic%2Ftraffic.json&query=%24.views_total&label=visits&logo=github&logoColor=white&color=6e5494&cacheSeconds=3600" alt="Repository visits"></a>
 </p>
 
 ---

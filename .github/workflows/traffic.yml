@@ -1,0 +1,38 @@
+name: Traffic
+
+# Records repository views and clones once a day. GitHub only keeps 14 days of traffic
+# and only shows it to the owner, so this merges each day into a running history on the
+# `traffic` branch, which the README badges read. Needs TRAFFIC_TOKEN: a fine-grained
+# personal access token for this repo with "Administration: read" (traffic is admin-only).
+
+on:
+  schedule:
+    - cron: '17 3 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  traffic:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          path: main
+      - uses: actions/checkout@v7
+        with:
+          ref: traffic
+          path: traffic
+      - name: Record today's traffic
+        env:
+          TRAFFIC_TOKEN: ${{ secrets.TRAFFIC_TOKEN }}
+          REPO: ${{ github.repository }}
+        run: python3 main/.github/scripts/traffic.py traffic/traffic.json
+      - name: Commit
+        working-directory: traffic
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add traffic.json
+          git diff --cached --quiet && echo "no change" || { git commit -m "traffic: $(date -u +%F)"; git push; }
