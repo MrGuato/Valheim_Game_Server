@@ -6,7 +6,7 @@ All notable changes to this project. Releases follow [semantic versioning](https
 
 ### Changed
 - Base image is Ubuntu 26.04 LTS (was 22.04). The default `ubuntu` user those images ship on UID 1000 is removed so `valheim` keeps that id. Tested against a copy of a live world: SteamCMD validation, world load, save on stop.
-- Only `ghcr.io/mrguato/valheim-game-server` is published now. The pre-2.0 name `ghcr.io/mrguato/valheim_game_server` keeps its existing tags but gets no new builds; set `IMAGE_REPOSITORY=ghcr.io/mrguato/valheim-game-server` in `.env` and run `./valheim update`.
+- Only `ghcr.io/mrguato/valheim-game-server` exists now; the pre-2.0 package `ghcr.io/mrguato/valheim_game_server` was deleted. If your `.env` still names it, set `IMAGE_REPOSITORY=ghcr.io/mrguato/valheim-game-server` and run `./valheim update`.
 - The image build now applies Ubuntu's pending package updates and removes the unused `pebble` binary the base image ships, which closes the Trivy findings against it.
 - GitHub Actions bumped (checkout 7, login-action 4, metadata-action 6, build-push-action 7, setup-buildx-action 4), and the README shows the container's pull count.
 
@@ -30,7 +30,7 @@ A year after 1.0, the project has its own container image and is now called **va
 
 ### Changed
 - Renamed the repository from `Valheim_Game_Server` to `valheim-game-server`. GitHub redirects the old URLs, but the docs site moved to `/valheim-game-server/`.
-- The default image is now `ghcr.io/mrguato/valheim-game-server`. The old name `ghcr.io/mrguato/valheim_game_server` is still published with the same tags, so existing installs keep updating.
+- The default image is now `ghcr.io/mrguato/valheim-game-server`. The old name `ghcr.io/mrguato/valheim_game_server` was still published with the same tags at the time (deleted 2026-10-24).
 - Watchtower runs once a day at 05:00 (it was hourly) and only updates labeled containers.
 
 ### Removed

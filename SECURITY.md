@@ -8,7 +8,7 @@ Useful things to include: what you found, how to reproduce it, and which image t
 
 ## What's covered
 
-- The container image `ghcr.io/mrguato/valheim-game-server`. The pre-2.0 name `ghcr.io/mrguato/valheim_game_server` stopped receiving builds on 2026-10-24 and is not supported.
+- The container image `ghcr.io/mrguato/valheim-game-server`. The pre-2.0 package `ghcr.io/mrguato/valheim_game_server` was deleted on 2026-10-24.
 - The scripts in this repo: `valheim`, the entrypoints, `scripts/`
 - The GitHub Actions workflows
 
