@@ -2,6 +2,13 @@
 
 All notable changes to this project. Releases follow [semantic versioning](https://semver.org/); image tags drop the `v` (`v2.0.0` → `2.0.0`, `2.0`).
 
+## [Unreleased]
+
+### Changed
+- Base image is Ubuntu 26.04 LTS (was 22.04). The default `ubuntu` user those images ship on UID 1000 is removed so `valheim` keeps that id. Tested against a copy of a live world: SteamCMD validation, world load, save on stop.
+- Only `ghcr.io/mrguato/valheim-game-server` is published now. The pre-2.0 name `ghcr.io/mrguato/valheim_game_server` keeps its existing tags but gets no new builds; set `IMAGE_REPOSITORY=ghcr.io/mrguato/valheim-game-server` in `.env` and run `./valheim update`.
+- GitHub Actions bumped (checkout 7, login-action 4, metadata-action 6, build-push-action 7, setup-buildx-action 4), and the README shows the container's pull count.
+
 ## [2.0.0] - 2026-10-23
 
 A year after 1.0, the project has its own container image and is now called **valheim-game-server**.

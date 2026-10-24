@@ -19,7 +19,6 @@ env:
   IMAGE_NAME: mrguato/valheim-game-server
   # The repo was called Valheim_Game_Server until v2.0.0. Keep publishing the old image
   # name too, so servers (and Watchtower) that still pull it keep getting updates.
-  LEGACY_IMAGE_NAME: mrguato/valheim_game_server
 
 jobs:
   build:
@@ -47,7 +46,6 @@ jobs:
         with:
           images: |
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
-            ${{ env.REGISTRY }}/${{ env.LEGACY_IMAGE_NAME }}
           tags: |
             type=ref,event=branch
             type=ref,event=pr
