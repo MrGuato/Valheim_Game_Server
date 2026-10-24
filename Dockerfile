@@ -18,13 +18,16 @@ ENV DEBIAN_FRONTEND=noninteractive \
 
 RUN dpkg --add-architecture i386 \
  && apt-get update \
+ && apt-get upgrade -y --no-install-recommends \
  && apt-get install -y --no-install-recommends \
       ca-certificates curl locales tzdata procps gosu unzip \
       lib32gcc-s1 lib32stdc++6 libc6:i386 \
       libsdl2-2.0-0 libpulse0 libpulse-mainloop-glib0 libatomic1 \
  && sed -i 's/^# \(en_US.UTF-8 UTF-8\)/\1/' /etc/locale.gen \
  && locale-gen \
- && rm -rf /var/lib/apt/lists/*
+ && rm -rf /var/lib/apt/lists/* \
+ # the base image ships Canonical's pebble service manager; unused here and a CVE magnet
+ && rm -f /usr/bin/pebble
 
 # Ubuntu 24.04+ images ship a default "ubuntu" user on UID/GID 1000; make room for ours
 RUN (id ubuntu >/dev/null 2>&1 && userdel -r ubuntu || true) \
