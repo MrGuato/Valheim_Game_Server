@@ -2,13 +2,24 @@
 
 All notable changes to this project. Releases follow [semantic versioning](https://semver.org/); image tags drop the `v` (`v2.0.0` → `2.0.0`, `2.0`).
 
-## [Unreleased]
+## [2.1.0] - 2026-10-24
+
+The first release on Ubuntu 26.04, with one package name and a cleaner image.
 
 ### Changed
-- Base image is Ubuntu 26.04 LTS (was 22.04). The default `ubuntu` user those images ship on UID 1000 is removed so `valheim` keeps that id. Tested against a copy of a live world: SteamCMD validation, world load, save on stop.
-- Only `ghcr.io/mrguato/valheim-game-server` exists now; the pre-2.0 package `ghcr.io/mrguato/valheim_game_server` was deleted. If your `.env` still names it, set `IMAGE_REPOSITORY=ghcr.io/mrguato/valheim-game-server` and run `./valheim update`.
-- The image build now applies Ubuntu's pending package updates and removes the unused `pebble` binary the base image ships, which closes the Trivy findings against it.
-- GitHub Actions bumped (checkout 7, login-action 4, metadata-action 6, build-push-action 7, setup-buildx-action 4), and the README shows the container's pull count.
+- Base image is **Ubuntu 26.04 LTS** (was 22.04). The default `ubuntu` user those images ship on UID 1000 is removed so `valheim` keeps that id. Tested against a copy of a live world before release: SteamCMD validation, world load, save on stop. Nothing changes for the host: any Linux with Docker 24+ runs it.
+- The build applies Ubuntu's pending package updates, so each release carries current security fixes instead of the base image's snapshot.
+- GitHub Actions bumped (checkout 7, login-action 4, metadata-action 6, build-push-action 7, setup-buildx-action 4, codeql-action 4). The README shows the container's pull count.
+
+### Removed
+- The pre-2.0 package `ghcr.io/mrguato/valheim_game_server` has been deleted. Only `ghcr.io/mrguato/valheim-game-server` exists. If your `.env` still names the old one, set `IMAGE_REPOSITORY=ghcr.io/mrguato/valheim-game-server` and run `./valheim update`.
+- The unused `pebble` binary the 26.04 base image ships; Trivy flagged fourteen Go CVEs in it.
+
+### Security
+- `.trivyignore` records that starting as root is deliberate (volume ownership, then gosu to PUID/PGID), so that finding stays closed. All Trivy and CodeQL alerts on the repo are resolved.
+
+### Upgrading from 2.0.0
+Nothing to change if you follow `latest`: Watchtower or `./valheim update` picks it up and the server restarts once (it saves first). If you pin, set `IMAGE_TAG=2.1.0` and run `./valheim update`.
 
 ## [2.0.0] - 2026-10-23
 

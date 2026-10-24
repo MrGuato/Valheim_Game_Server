@@ -42,7 +42,7 @@ nano .env
 | Variable           | Default                                   | Description |
 | ------------------ | ----------------------------------------- | ----------- |
 | `IMAGE_REPOSITORY` | `ghcr.io/mrguato/valheim-game-server`     | Image source. Change it to run a fork or a locally built image |
-| `IMAGE_TAG`        | `latest`                                  | Image tag. Pin a release such as `2.0.0` for production |
+| `IMAGE_TAG`        | `latest`                                  | Image tag. Pin a release such as `2.1.0` for production |
 | `CONTAINER_NAME`   | `valheim`                                 | Docker container name |
 | `PUID`             | `1000`                                    | UID the server runs as. Match the owner of `./config` and `./data`. `0` runs as root |
 | `PGID`             | `1000`                                    | GID the server runs as |
@@ -111,7 +111,7 @@ Edit them while the server runs; Valheim reloads them, but a restart is the safe
 ## Pinning an image version
 
 ```ini
-IMAGE_TAG=2.0.0
+IMAGE_TAG=2.1.0
 ```
 
 Then `./valheim update` only pulls that version. Tags are listed on the [container image page](https://github.com/MrGuato/valheim-game-server/pkgs/container/valheim-game-server). Watchtower only follows the tag you pinned.

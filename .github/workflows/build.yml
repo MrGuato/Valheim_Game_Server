@@ -17,8 +17,6 @@ on:
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: mrguato/valheim-game-server
-  # The repo was called Valheim_Game_Server until v2.0.0. Keep publishing the old image
-  # name too, so servers (and Watchtower) that still pull it keep getting updates.
 
 jobs:
   build:

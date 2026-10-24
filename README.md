@@ -59,7 +59,7 @@ There are plenty of ways to run a Valheim server. I built this one because I hos
 - Nothing from GitHub can reach your host: there's no self-hosted runner or deploy hook. Your host pulls a public image, and that's the only connection.
 - The image is built in the open by GitHub Actions. Every change goes through hadolint, shellcheck, CodeQL, gitleaks and Trivy (config and image scans), and Dependabot keeps base images and actions current.
 - The optional BepInEx mod loader is baked into the image at a pinned version with a SHA-256 check, so a server start never downloads and runs code from the internet.
-- Versioned releases (`IMAGE_TAG=2.0.0`) let you pin exactly what you run.
+- Versioned releases (`IMAGE_TAG=2.1.0`) let you pin exactly what you run.
 
 ### Compared with the usual options
 
@@ -170,7 +170,7 @@ Only infrastructure code lives here: no game files, worlds, server addresses or 
 
 ## Releases and versioning
 
-`latest` follows `main`. Tagged releases (`2.0.0`, `2.0`) stay put, so set `IMAGE_TAG=2.0.0` to pin one and update when you choose. What changed in each release is in the [CHANGELOG](CHANGELOG.md) and on the [releases page](https://github.com/MrGuato/valheim-game-server/releases).
+`latest` follows `main`. Tagged releases (`2.1.0`, `2.1`) stay put, so set `IMAGE_TAG=2.1.0` to pin one and update when you choose. What changed in each release is in the [CHANGELOG](CHANGELOG.md) and on the [releases page](https://github.com/MrGuato/valheim-game-server/releases).
 
 ## Contributing and security
 
